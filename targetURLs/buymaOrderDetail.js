@@ -1,15 +1,15 @@
 const puppeteer = require('puppeteer');
 const path = require('path');
 
-// buyma 取引ID 크롤링
-async function buymaOrderList() {
+// buyma 주문정보 상세 크롤링
+async function buymaOrderDetail(transactionID) {
     
     const id = process.env.BUYMA_ID || buymaId;
     const password = process.env.BUYMA_PASSWORD || buymaPassword;
     let browser = {};
     let page = {};
 
-    let transactionIDArray = [];
+    let orderDetailObject = {};
 
     try {
         browser = await puppeteer.launch({
@@ -29,7 +29,7 @@ async function buymaOrderList() {
     //     height: 1080,
     // });
     await page.setDefaultNavigationTimeout(0);
-    await page.goto('https://www.buyma.com/my/buyerorders/?kw=&sts[]=0');
+    await page.goto(`https://www.buyma.com/my/buyerorderdetail/?tid=${transactionID}`);
 
     // 로그인 작업 건너뛰기
     if (await page.$('.user_name')) {
@@ -44,25 +44,37 @@ async function buymaOrderList() {
         console.log('로그인했습니다.')
     }
 
+    // 본인 확인
+    if (await page.$('#txtLoginPass')) {
+        await page.evaluate((password) => {
+            // 본인 확인 입력
+            document.querySelector('#txtLoginPass').value = password;
+            document.querySelector('#login_do').click();
+        }, password);
+        console.log('본인확인했습니다.')
+    } else {
+        console.log('이미 본인확인 되어있습니다.')
+    }
+
     await page.waitForTimeout(20000); // 없으면 크롤링 안됨
-    // 取引ID 크롤링
-    console.log('取引ID취득');
-    transactionIDArray = await page.evaluate(() => {
-        const tags = document.querySelectorAll('table tbody tr td:nth-of-type(4) p:nth-of-type(2) a');
-        const transactionIDArray = [];
-        tags.forEach((t)=> {
-            transactionIDArray.push({
-                transactionID : t.textContent
-            })
-        });
-        return transactionIDArray;
+    // 주문정보 상세 크롤링
+    console.log('주문정보 상세 취득');
+    orderDetailObject = await page.evaluate(() => {
+        const orderDetailObject = {};
+        const productId = document.querySelector("table tbody tr:nth-of-type(3) td").innerText.match(/\d{8}/g);
+        
+        // 商品ID
+        orderDetailObject.productId = productId;
+        return orderDetailObject;
     });
+
+    console.log("orderDetailObject",orderDetailObject);
 
     await page.close();
     await browser.close();
-    console.log('取引ID 크롤링 종료.');
+    console.log('주문정보 상세 크롤링 종료.');
 
-    return transactionIDArray;
+    return orderDetailObject;
     }
     catch(e) {
         console.log(e);
@@ -71,4 +83,4 @@ async function buymaOrderList() {
     } 
 }
 
-module.exports.buymaOrderList = buymaOrderList;
+module.exports.buymaOrderDetail = buymaOrderDetail;
