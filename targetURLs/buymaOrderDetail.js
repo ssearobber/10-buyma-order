@@ -44,7 +44,7 @@ async function buymaOrderDetail(transactionID) {
         console.log('로그인했습니다.')
     }
 
-    // 본인 확인
+    // 본인 확인 작업 건너뛰기
     if (await page.$('#txtLoginPass')) {
         await page.evaluate((password) => {
             // 본인 확인 입력
@@ -61,14 +61,22 @@ async function buymaOrderDetail(transactionID) {
     console.log('주문정보 상세 취득');
     orderDetailObject = await page.evaluate(() => {
         const orderDetailObject = {};
-        const productId = document.querySelector("table tbody tr:nth-of-type(3) td").innerText.match(/\d{8}/g);
+        let productId = document.querySelector("table tbody tr:nth-of-type(3) td").innerText.match(/\d{8}/g);
+        let productCustomerNameArray = document.querySelector("table tbody tr:nth-of-type(7) td").innerText.split('\n');
+        let productCustomerPostalCode = document.querySelector("table tbody tr:nth-of-type(9) td").innerText.split('\n');
         
         // 商品ID
         orderDetailObject.productId = productId;
+        // お客様氏名（日本語）
+        orderDetailObject.productCustomerJPName = productCustomerNameArray[0] + " " +productCustomerNameArray[1];
+        // お客様氏名（英語）
+        orderDetailObject.productCustomerENName = productCustomerNameArray[2];
+        // 郵便番号
+        orderDetailObject.productCustomerPostalCode = productCustomerPostalCode;
         return orderDetailObject;
     });
 
-    console.log("orderDetailObject",orderDetailObject);
+    // TODO 구글 시트(利益計算)에서 商品ID에 해당하는 row넘버, 이익 취득
 
     await page.close();
     await browser.close();

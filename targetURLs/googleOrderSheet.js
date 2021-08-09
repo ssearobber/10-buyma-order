@@ -27,18 +27,18 @@ async function googleOrderSheet(transactionID) {
     const rows = await sheet.getRows();
 
     // 구글 시트(受注list)에 取引ID가 존재하는지 확인
-    let transactionIDExistenceCheck = false ;
+    let isTransactionID = false ;
     for (i = 1 ; i < rows.length ; i ++) {
         // 구글 시트(受注list)에 取引ID가 존재하는 경우 패스
         if(rows[i].transactionID == transactionID) {
-            transactionIDExistenceCheck = true;
+            isTransactionID = true;
             break;
         }
     }
 
     // buyma 주문 상세페이지에서 정보 취득
     // 구글 시트(利益計算)에서 값을 취득 함
-    if (!transactionIDExistenceCheck) await buymaOrderDetail(transactionID);
+    if (!isTransactionID) await buymaOrderDetail(transactionID);
     
 }
 
