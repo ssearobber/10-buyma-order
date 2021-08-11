@@ -36,7 +36,6 @@ async function googleOrderSheet(transactionID) {
             break;
         }
     }
-
     // buyma 주문 상세페이지에서 정보 취득
     // 구글 시트(利益計算)에서 값을 취득 함
     if (!isTransactionID) {
