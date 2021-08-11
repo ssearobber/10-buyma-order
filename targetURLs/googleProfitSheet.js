@@ -26,11 +26,19 @@ async function googleProfitSheet(productId) {
     const rows = await sheet.getRows();
 
     // 해당 商品ID의 row번호, url을 취득
+    let googleProfitObject = {}
     for (i = 1 ; i < rows.length ; i ++) {
         // 해당 商品ID가 존재하는 row
-
+        if (rows[i].productId.match(/\d{10}/g) == productId) {
+            googleProfitObject.rowNum = i + 2;
+            googleProfitObject.productURL = rows[i].productURL;
+            googleProfitObject.shipProfit = rows[i].shipProfit.replace(/[^0-9]/g,"");
+            googleProfitObject.EMSProfit = rows[i].EMSProfit.replace(/[^0-9]/g,"");
+            googleProfitObject.qxpressProfit = rows[i].qxpressProfit.replace(/[^0-9]/g,"");
+        }
     }
     
+    return googleProfitObject;
 }
 
 module.exports.googleProfitSheet = googleProfitSheet;

@@ -1,5 +1,5 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const { googleProfitSheet } = require('./googleProfitSheet');
+const { buymaOrderDetail } = require('./buymaOrderDetail');
 
 async function googleOrderSheet(transactionID) {
 
@@ -27,6 +27,7 @@ async function googleOrderSheet(transactionID) {
     const rows = await sheet.getRows();
 
     // 구글 시트(受注list)에 取引ID가 존재하는지 확인
+    let orderDetailObject;
     let isTransactionID = false ;
     for (i = 1 ; i < rows.length ; i ++) {
         // 구글 시트(受注list)에 取引ID가 존재하는 경우 패스
@@ -38,8 +39,33 @@ async function googleOrderSheet(transactionID) {
 
     // buyma 주문 상세페이지에서 정보 취득
     // 구글 시트(利益計算)에서 값을 취득 함
-    if (!isTransactionID) await buymaOrderDetail(transactionID);
-    
+    if (!isTransactionID) {
+        orderDetailObject = await buymaOrderDetail(transactionID);
+        // 구글 시트(受注list)에 값입력
+        for (i = 1 ; i < rows.length ; i ++) {
+            // row 추가
+            if(!rows[i].transactionID) {
+                rows[i].transactionID = orderDetailObject.transactionID;
+                rows[i].productOrderDate = orderDetailObject.productOrderDate;
+                rows[i].rowNum = orderDetailObject.rowNum;
+                rows[i].productURL = orderDetailObject.productURL;
+                rows[i].productCount = orderDetailObject.productCount;
+                rows[i].productColor = orderDetailObject.productColor;
+                rows[i].productDeliveryMethod = orderDetailObject.productDeliveryMethod;
+                rows[i].productCustomerJPName = orderDetailObject.productCustomerJPName;
+                rows[i].productCustomerJPAddress = orderDetailObject.productCustomerJPAddress;
+                rows[i].productCustomerENName = orderDetailObject.productCustomerENName;
+                rows[i].productCustomerPostalCode = orderDetailObject.productCustomerPostalCode;
+                rows[i].productCustomerENAddress = orderDetailObject.productCustomerENAddress;
+                rows[i].productCustomerCellPhoneNumber = orderDetailObject.productCustomerCellPhoneNumber;
+                rows[i].productProfit = orderDetailObject.productProfit;
+
+                rows[i].save();
+                break;
+            }
+        }
+    }
+
 }
 
 module.exports.googleOrderSheet = googleOrderSheet;

@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 const path = require('path');
-const { buymaOrderDetail } = require('./buymaOrderDetail');
+const { googleProfitSheet } = require('./googleProfitSheet');
 
 // buyma 주문정보 상세 크롤링
 async function buymaOrderDetail(transactionID) {
@@ -52,9 +52,9 @@ async function buymaOrderDetail(transactionID) {
             document.querySelector('#txtLoginPass').value = password;
             document.querySelector('#login_do').click();
         }, password);
-        console.log('본인확인했습니다.')
+        console.log('바이머 상세화면에서 본인확인했습니다.')
     } else {
-        console.log('이미 본인확인 되어있습니다.')
+        console.log('바이머 상세화면에 이미 본인확인 되어있습니다.')
     }
 
     await page.waitForTimeout(20000); // 없으면 크롤링 안됨
@@ -69,43 +69,56 @@ async function buymaOrderDetail(transactionID) {
         let productCustomerENAddress = document.querySelector("table tbody tr:nth-of-type(10) td dl:nth-of-type(2) dd").innerText.split('\n');
         let productCustomerCellPhoneNumber = document.querySelector("table tbody tr:nth-of-type(11) td ").innerText.match(/\d{2,4}-\d{2,4}-\d{2,4}/g);
         let productCount = document.querySelector("table tbody tr:nth-of-type(13) td ").innerText.match(/\d{1,2}/g);
-        let productOrderDate = document.querySelector("table tbody tr:nth-of-type(17) td ").innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
-        let productColor = document.querySelector("table tbody tr:nth-of-type(18) td ").innerText;
-        let productDeliveryMethod = document.querySelector("table tbody tr:nth-of-type(12) td ").innerText.match(/(?<=通常)\d{1}/g);;
+        let productOrderDate = document.querySelector("table tbody tr:nth-of-type(16) td ").innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
+        let productColor = document.querySelector("table tbody tr:nth-of-type(17) td ").innerText;
+        let productDeliveryMethod = document.querySelector("table tbody tr:nth-of-type(12) td ").innerText.match(/(?<=通常)\d{1,2}/g);;
 
         // 商品ID
-        orderDetailObject.productId = productId;
+        orderDetailObject.productId = "00" + productId[0];
         // お客様氏名（日本語）
         orderDetailObject.productCustomerJPName = productCustomerNameArray[0] + " " +productCustomerNameArray[1];
         // お客様氏名（英語）
         orderDetailObject.productCustomerENName = productCustomerNameArray[2];
         // 郵便番号
-        orderDetailObject.productCustomerPostalCode = productCustomerPostalCode;
+        orderDetailObject.productCustomerPostalCode = productCustomerPostalCode[0];
         // 住所（日本語）
         orderDetailObject.productCustomerJPAddress = productCustomerJPAddress[0] + " " + productCustomerJPAddress[1] + " " + productCustomerJPAddress[2]
         // 住所（英語）
         orderDetailObject.productCustomerENAddress = productCustomerENAddress[3] + " " + productCustomerENAddress[2] + " " + productCustomerENAddress[1] + " " + productCustomerENAddress[0]
         // 携帯番号
-        orderDetailObject.productCustomerCellPhoneNumber = productCustomerCellPhoneNumber;
+        orderDetailObject.productCustomerCellPhoneNumber = productCustomerCellPhoneNumber[0];
         // 個数
-        orderDetailObject.productCount = productCount;
+        orderDetailObject.productCount = productCount[0];
         // 受注日
-        orderDetailObject.productOrderDate = productOrderDate;
+        orderDetailObject.productOrderDate = productOrderDate[0];
         // カラー
         orderDetailObject.productColor = productColor;
         // 配送方法
-        if (productDeliveryMethod == "4") productDeliveryMethod = "国内発送"
-        else if (productDeliveryMethod == "5") productDeliveryMethod = "ems"
-        else if (productDeliveryMethod == "12") productDeliveryMethod = "qxpress"
-        else if (productDeliveryMethod == "30") productDeliveryMethod = "ship"
+        if (productDeliveryMethod[0] == "4") orderDetailObject.productDeliveryMethod = "国内発送"
+        else if (productDeliveryMethod[0] == "5") orderDetailObject.productDeliveryMethod = "ems"
+        else if (productDeliveryMethod[0] == "12") orderDetailObject.productDeliveryMethod = "qxpress"
+        else if (productDeliveryMethod[0] == "25") orderDetailObject.productDeliveryMethod = "ems" // 중국으로부터 오는 유리테이블
+        else if (productDeliveryMethod[0] == "30") orderDetailObject.productDeliveryMethod = "ship"
 
-        orderDetailObject.productDeliveryMethod = productDeliveryMethod;
-        
         return orderDetailObject;
     });
 
-    // TODO 구글 시트(利益計算)에서 商品ID에 해당하는 row넘버, 이익 취득
-    googleProfitSheet(orderDetailObject.productId);
+    // 구글 시트(利益計算)에서 商品ID에 해당하는 row넘버, 이익 취득
+    console.log('구글 시트(利益計算)에서 정보 취득');
+    let googleProfitObject = await googleProfitSheet(orderDetailObject.productId);
+    console.log('구글 시트(利益計算)에서 정보 취득 종료');
+    // 구글 시트(利益計算)에서 商品ID에 해당하는 row넘버 셋팅
+    orderDetailObject.rowNum = googleProfitObject.rowNum;
+    // 상품 url 셋팅
+    orderDetailObject.productURL = googleProfitObject.productURL;
+    // 이익 셋팅
+    if (orderDetailObject.productDeliveryMethod == "国内発送") orderDetailObject.productProfit = 0
+    else if (orderDetailObject.productDeliveryMethod == "ems") orderDetailObject.productProfit = googleProfitObject.EMSProfit * orderDetailObject.productCount
+    else if (orderDetailObject.productDeliveryMethod == "qxpress") orderDetailObject.productProfit = googleProfitObject.qxpressProfit * orderDetailObject.productCount
+    else if (orderDetailObject.productDeliveryMethod == "ship") orderDetailObject.productProfit = googleProfitObject.shipProfit * orderDetailObject.productCount
+
+    // 取引ID
+    orderDetailObject.transactionID = transactionID;
 
     await page.close();
     await browser.close();
