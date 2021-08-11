@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const path = require('path');
+const { buymaOrderDetail } = require('./buymaOrderDetail');
 
 // buyma 주문정보 상세 크롤링
 async function buymaOrderDetail(transactionID) {
@@ -64,7 +65,14 @@ async function buymaOrderDetail(transactionID) {
         let productId = document.querySelector("table tbody tr:nth-of-type(3) td").innerText.match(/\d{8}/g);
         let productCustomerNameArray = document.querySelector("table tbody tr:nth-of-type(7) td").innerText.split('\n');
         let productCustomerPostalCode = document.querySelector("table tbody tr:nth-of-type(9) td").innerText.split('\n');
-        
+        let productCustomerJPAddress = document.querySelector("table tbody tr:nth-of-type(10) td dl:nth-of-type(1) dd").innerText.split('\n');
+        let productCustomerENAddress = document.querySelector("table tbody tr:nth-of-type(10) td dl:nth-of-type(2) dd").innerText.split('\n');
+        let productCustomerCellPhoneNumber = document.querySelector("table tbody tr:nth-of-type(11) td ").innerText.match(/\d{2,4}-\d{2,4}-\d{2,4}/g);
+        let productCount = document.querySelector("table tbody tr:nth-of-type(13) td ").innerText.match(/\d{1,2}/g);
+        let productOrderDate = document.querySelector("table tbody tr:nth-of-type(17) td ").innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
+        let productColor = document.querySelector("table tbody tr:nth-of-type(18) td ").innerText;
+        let productDeliveryMethod = document.querySelector("table tbody tr:nth-of-type(12) td ").innerText.match(/(?<=通常)\d{1}/g);;
+
         // 商品ID
         orderDetailObject.productId = productId;
         // お客様氏名（日本語）
@@ -73,10 +81,31 @@ async function buymaOrderDetail(transactionID) {
         orderDetailObject.productCustomerENName = productCustomerNameArray[2];
         // 郵便番号
         orderDetailObject.productCustomerPostalCode = productCustomerPostalCode;
+        // 住所（日本語）
+        orderDetailObject.productCustomerJPAddress = productCustomerJPAddress[0] + " " + productCustomerJPAddress[1] + " " + productCustomerJPAddress[2]
+        // 住所（英語）
+        orderDetailObject.productCustomerENAddress = productCustomerENAddress[3] + " " + productCustomerENAddress[2] + " " + productCustomerENAddress[1] + " " + productCustomerENAddress[0]
+        // 携帯番号
+        orderDetailObject.productCustomerCellPhoneNumber = productCustomerCellPhoneNumber;
+        // 個数
+        orderDetailObject.productCount = productCount;
+        // 受注日
+        orderDetailObject.productOrderDate = productOrderDate;
+        // カラー
+        orderDetailObject.productColor = productColor;
+        // 配送方法
+        if (productDeliveryMethod == "4") productDeliveryMethod = "国内発送"
+        else if (productDeliveryMethod == "5") productDeliveryMethod = "ems"
+        else if (productDeliveryMethod == "12") productDeliveryMethod = "qxpress"
+        else if (productDeliveryMethod == "30") productDeliveryMethod = "ship"
+
+        orderDetailObject.productDeliveryMethod = productDeliveryMethod;
+        
         return orderDetailObject;
     });
 
     // TODO 구글 시트(利益計算)에서 商品ID에 해당하는 row넘버, 이익 취득
+    googleProfitSheet(orderDetailObject.productId);
 
     await page.close();
     await browser.close();

@@ -1,7 +1,6 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const { googleProfitSheet } = require('./googleProfitSheet');
 
-async function googleOrderSheet(transactionID) {
+async function googleProfitSheet(productId) {
 
     // 시트 url중 값
     // Initialize the sheet - doc ID is the long id in the sheets URL
@@ -21,25 +20,17 @@ async function googleOrderSheet(transactionID) {
     await doc.loadInfo();
 
     // the buymaList 시트ID로 시트취득
-    const sheet = doc.sheetsById[process.env.GOOGLE_ORDER_SHEET_ID || googleOrderSheetId];
+    const sheet = doc.sheetsById[process.env.GOOGLE_PROFIT_SHEET_ID || googleProfitSheetId];
 
     // rows 취득
     const rows = await sheet.getRows();
 
-    // 구글 시트(受注list)에 取引ID가 존재하는지 확인
-    let isTransactionID = false ;
+    // 해당 商品ID의 row번호, url을 취득
     for (i = 1 ; i < rows.length ; i ++) {
-        // 구글 시트(受注list)에 取引ID가 존재하는 경우 패스
-        if(rows[i].transactionID == transactionID) {
-            isTransactionID = true;
-            break;
-        }
-    }
+        // 해당 商品ID가 존재하는 row
 
-    // buyma 주문 상세페이지에서 정보 취득
-    // 구글 시트(利益計算)에서 값을 취득 함
-    if (!isTransactionID) await buymaOrderDetail(transactionID);
+    }
     
 }
 
-module.exports.googleOrderSheet = googleOrderSheet;
+module.exports.googleProfitSheet = googleProfitSheet;
