@@ -62,47 +62,48 @@ async function buymaOrderDetail(transactionID) {
     console.log('주문정보 상세 취득');
     orderDetailObject = await page.evaluate(() => {
         const orderDetailObject = {};
-        let productId = document.querySelector("table tbody tr:nth-of-type(3) td").innerText.match(/\d{8}/g);
-        let productCustomerNameArray = document.querySelector("table tbody tr:nth-of-type(7) td").innerText.split('\n');
-        let productCustomerPostalCode = document.querySelector("table tbody tr:nth-of-type(9) td").innerText.split('\n');
-        let productCustomerJPAddress = document.querySelector("table tbody tr:nth-of-type(10) td dl:nth-of-type(1) dd").innerText.split('\n');
-        let productCustomerENAddress = document.querySelector("table tbody tr:nth-of-type(10) td dl:nth-of-type(2) dd").innerText.split('\n');
-        let productCustomerCellPhoneNumber = document.querySelector("table tbody tr:nth-of-type(11) td ").innerText.match(/\d{2,4}-\d{2,4}-\d{2,4}/g);
-        let productCount = document.querySelector("table tbody tr:nth-of-type(13) td ").innerText.match(/\d{1,2}/g);
-        let productOrderDate = document.querySelector("table tbody tr:nth-of-type(16) td ").innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
-        let productColor = document.querySelector("table tbody tr:nth-of-type(17) td ").innerText;
-        let productDeliveryMethod = document.querySelector("table tbody tr:nth-of-type(12) td ").innerText.match(/(?<=通常)\d{1,2}/g);;
+        let productId = document.querySelector("table tbody tr:nth-of-type(3) td")?.innerText.match(/\d{8}/g);
+        let productCustomerNameArray = document.querySelector("table tbody tr:nth-of-type(7) td")?.innerText.split('\n');
+        let productCustomerPostalCode = document.querySelector("table tbody tr:nth-of-type(9) td")?.innerText.split('\n');
+        let productCustomerJPAddress = document.querySelector("table tbody tr:nth-of-type(10) td dl:nth-of-type(1) dd")?.innerText.split('\n');
+        let productCustomerENAddress = document.querySelector("table tbody tr:nth-of-type(10) td dl:nth-of-type(2) dd")?.innerText.split('\n');
+        let productCustomerCellPhoneNumber = document.querySelector("table tbody tr:nth-of-type(11) td ")?.innerText.match(/\d{2,4}-\d{2,4}-\d{2,4}/g);
+        let productCount = document.querySelector("table tbody tr:nth-of-type(13) td ")?.innerText.match(/\d{1,2}/g);
+        let productOrderDate = document.querySelector("table tbody tr:nth-of-type(16) td ")?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
+        let productColor = document.querySelector("table tbody tr:nth-of-type(17) td ")?.innerText;
+        let productDeliveryMethod = document.querySelector("table tbody tr:nth-of-type(12) td ")?.innerText.match(/(?<=通常)\d{1,2}/g);;
 
         // 商品ID
-        orderDetailObject.productId = "00" + productId[0];
+        productId ? (orderDetailObject.productId = "00" + productId[0]) : null
         // お客様氏名（日本語）
-        orderDetailObject.productCustomerJPName = productCustomerNameArray[0] + " " +productCustomerNameArray[1];
+        productCustomerNameArray ? (orderDetailObject.productCustomerJPName = productCustomerNameArray[0] + " " + productCustomerNameArray[1]) : null
         // お客様氏名（英語）
-        orderDetailObject.productCustomerENName = productCustomerNameArray[2];
+        productCustomerNameArray ? (orderDetailObject.productCustomerENName = productCustomerNameArray[2]) : null
         // 郵便番号
-        orderDetailObject.productCustomerPostalCode = productCustomerPostalCode[0];
+        productCustomerPostalCode ? (orderDetailObject.productCustomerPostalCode = productCustomerPostalCode[0]) : null
         // 住所（日本語）
-        orderDetailObject.productCustomerJPAddress = productCustomerJPAddress[0] + " " + productCustomerJPAddress[1] + " " + productCustomerJPAddress[2]
+        productCustomerJPAddress ? (orderDetailObject.productCustomerJPAddress = productCustomerJPAddress[0] + " " + productCustomerJPAddress[1] + " " + productCustomerJPAddress[2]) : null
         // 住所（英語）
-        orderDetailObject.productCustomerENAddress = productCustomerENAddress[3] + " " + productCustomerENAddress[2] + " " + productCustomerENAddress[1] + " " + productCustomerENAddress[0]
+        productCustomerENAddress ? (orderDetailObject.productCustomerENAddress = productCustomerENAddress[3] + " " + productCustomerENAddress[2] + " " + productCustomerENAddress[1] + " " + productCustomerENAddress[0]) : null
         // 携帯番号
-        orderDetailObject.productCustomerCellPhoneNumber = productCustomerCellPhoneNumber[0];
+        productCustomerCellPhoneNumber ? (orderDetailObject.productCustomerCellPhoneNumber = productCustomerCellPhoneNumber[0]) : null
         // 個数
-        orderDetailObject.productCount = productCount[0];
+        productCount ? (orderDetailObject.productCount = productCount[0]) : null
         // 受注日
-        orderDetailObject.productOrderDate = productOrderDate[0];
+        productOrderDate ? (orderDetailObject.productOrderDate = productOrderDate[0]) : null
         // カラー
         orderDetailObject.productColor = productColor;
         // 配送方法
-        if (productDeliveryMethod[0] == "4") orderDetailObject.productDeliveryMethod = "国内発送"
-        else if (productDeliveryMethod[0] == "5") orderDetailObject.productDeliveryMethod = "ems"
-        else if (productDeliveryMethod[0] == "12") orderDetailObject.productDeliveryMethod = "qxpress"
-        else if (productDeliveryMethod[0] == "25") orderDetailObject.productDeliveryMethod = "ems" // 중국으로부터 오는 유리테이블
-        else if (productDeliveryMethod[0] == "30") orderDetailObject.productDeliveryMethod = "ship"
-
+        if (productDeliveryMethod) {
+            if (productDeliveryMethod[0] == "4") orderDetailObject.productDeliveryMethod = "国内発送"
+            else if (productDeliveryMethod[0] == "5") orderDetailObject.productDeliveryMethod = "ems"
+            else if (productDeliveryMethod[0] == "12") orderDetailObject.productDeliveryMethod = "qxpress"
+            else if (productDeliveryMethod[0] == "25") orderDetailObject.productDeliveryMethod = "ems" // 중국으로부터 오는 유리테이블
+            else if (productDeliveryMethod[0] == "30") orderDetailObject.productDeliveryMethod = "ship"
+        }
+        
         return orderDetailObject;
     });
-
     // 구글 시트(利益計算)에서 商品ID에 해당하는 row넘버, 이익 취득
     console.log('구글 시트(利益計算)에서 정보 취득');
     let googleProfitObject = await googleProfitSheet(orderDetailObject.productId);

@@ -41,7 +41,9 @@ async function buymaOrderList() {
             document.querySelector('#txtLoginPass').value = password;
             document.querySelector('#login_do').click();
         }, id,password);
-        console.log('로그인했습니다.')
+        console.log('로그인했습니다.');
+        await page.waitForTimeout(10000); // 로그인 로딩 기다림
+        await page.goto('https://www.buyma.com/my/buyerorders/?kw=&sts[]=0'); // 로그인 후, 다시 해당 페이지 이동
     }
 
     await page.waitForTimeout(20000); // 없으면 크롤링 안됨
@@ -57,7 +59,6 @@ async function buymaOrderList() {
         });
         return transactionIDArray;
     });
-
     await page.close();
     await browser.close();
     console.log('取引ID 크롤링 종료.');
