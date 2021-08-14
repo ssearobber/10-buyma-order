@@ -68,10 +68,17 @@ async function buymaOrderDetail(transactionID) {
         let productCustomerJPAddress = document.querySelector("table tbody tr:nth-of-type(10) td dl:nth-of-type(1) dd")?.innerText.split('\n');
         let productCustomerENAddress = document.querySelector("table tbody tr:nth-of-type(10) td dl:nth-of-type(2) dd")?.innerText.split('\n');
         let productCustomerCellPhoneNumber = document.querySelector("table tbody tr:nth-of-type(11) td ")?.innerText.match(/\d{2,4}-\d{2,4}-\d{2,4}/g);
-        let productCount = document.querySelector("table tbody tr:nth-of-type(13) td ")?.innerText.match(/\d{1,2}/g);
-        let productOrderDate = document.querySelector("table tbody tr:nth-of-type(16) td ")?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
-        let productColor = document.querySelector("table tbody tr:nth-of-type(17) td ")?.innerText;
-        let productDeliveryMethod = document.querySelector("table tbody tr:nth-of-type(12) td ")?.innerText.match(/(?<=通常)\d{1,2}/g);;
+        let productCount = document.querySelector("table tbody tr:nth-of-type(13) td")?.innerText.match(/\d{1,2}/g);
+        let productOrderDate = document.querySelector("table tbody tr:nth-of-type(16) td")?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
+        // 2021/08/14 update 편의점 지불인 경우 분기처리
+        let productColor;
+        if (document.querySelector("table tbody tr:nth-of-type(14) td")?.innerHTML.match(/コンビニ/g)) {
+            productColor = document.querySelector("table tbody tr:nth-of-type(18) td")?.innerText;
+        } else {
+            productColor = document.querySelector("table tbody tr:nth-of-type(17) td")?.innerText;
+        }
+        
+        let productDeliveryMethod = document.querySelector("table tbody tr:nth-of-type(12) td")?.innerText.match(/(?<=通常)\d{1,2}/g);;
 
         // 商品ID
         productId ? (orderDetailObject.productId = "00" + productId[0]) : null
