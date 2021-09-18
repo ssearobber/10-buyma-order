@@ -74,6 +74,8 @@ async function buymaOrderDetail(transactionID) {
         let productColor;
         if (document.querySelector("table tbody tr:nth-of-type(14) td")?.innerHTML.match(/コンビニ/g)) {
             productColor = document.querySelector("table tbody tr:nth-of-type(18) td")?.innerText;
+        } else if (document.querySelector("table tbody tr:nth-of-type(14) td")?.innerHTML.match(/銀行振込（ペイジー）/g)) {
+            
         } else {
             productColor = document.querySelector("table tbody tr:nth-of-type(17) td")?.innerText;
         }
