@@ -69,15 +69,18 @@ async function buymaOrderDetail(transactionID) {
         let productCustomerENAddress = document.querySelector("table tbody tr:nth-of-type(10) td dl:nth-of-type(2) dd")?.innerText.split('\n');
         let productCustomerCellPhoneNumber = document.querySelector("table tbody tr:nth-of-type(11) td ")?.innerText.match(/\d{2,4}-\d{2,4}-\d{2,4}/g);
         let productCount = document.querySelector("table tbody tr:nth-of-type(13) td")?.innerText.match(/\d{1,2}/g);
-        let productOrderDate = document.querySelector("table tbody tr:nth-of-type(16) td")?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
+        // 2021/10/14 update productOrderDate도 지불방식에 따라 테이블 갯수가 달라져서 분기처리
         // 2021/08/14 update 편의점 지불인 경우 분기처리
+        let productOrderDate;
         let productColor;
         if (document.querySelector("table tbody tr:nth-of-type(14) td")?.innerHTML.match(/コンビニ/g)) {
+            productOrderDate = document.querySelector("table tbody tr:nth-of-type(17) td")?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
             productColor = document.querySelector("table tbody tr:nth-of-type(18) td")?.innerText;
         } else if (document.querySelector("table tbody tr:nth-of-type(14) td")?.innerHTML.match(/銀行振込（ペイジー）/g)) {
-            // 2021/10/14 update
-            productColor = document.querySelector("table tbody tr:nth-of-type(17) td")?.innerText;
+            productOrderDate = document.querySelector("table tbody tr:nth-of-type(17) td")?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
+            productColor = document.querySelector("table tbody tr:nth-of-type(18) td")?.innerText;
         } else {
+            productOrderDate = document.querySelector("table tbody tr:nth-of-type(16) td")?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
             productColor = document.querySelector("table tbody tr:nth-of-type(17) td")?.innerText;
         }
         
