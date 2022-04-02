@@ -27,8 +27,9 @@ async function googleProfitSheet(productId) {
   // 해당 商品ID의 row번호, url을 취득
   let googleProfitObject = {};
   for (i = 1; i < rows.length; i++) {
+    if (!rows[i].productId) continue;
     // 해당 商品ID가 존재하는 row
-    if (!rows[i].productId && rows[i].productId.match(/\d{10}/g) == productId) {
+    if (rows[i].productId.match(/\d{10}/g) == productId) {
       googleProfitObject.rowNum = i + 2;
       googleProfitObject.productURL = rows[i].productURL;
       googleProfitObject.shipProfit = rows[i].shipProfit.replace(/[^0-9]/g, '');
