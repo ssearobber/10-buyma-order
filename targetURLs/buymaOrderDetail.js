@@ -117,12 +117,6 @@ async function buymaOrderDetail(transactionID) {
         .querySelector('table tbody tr:nth-of-type(12) td')
         ?.innerText.match(/(?<=通常)\d{1,2}/g);
 
-      // 2022/04/23 영어주소 나눠서 취득
-      let productCustomerENAddress1;
-      let productCustomerENAddress2;
-      let productCustomerENAddress3;
-      let productCustomerENAddress4;
-
       // 商品ID
       productId ? (orderDetailObject.productId = '00' + productId[0]) : null;
       // お客様氏名（日本語）
@@ -160,19 +154,19 @@ async function buymaOrderDetail(transactionID) {
         : null;
       // 2022/04/23 영어주소 나눠서 취득
       // 住所1（英語）
-      productCustomerENAddress1
+      productCustomerENAddress[3]
         ? (orderDetailObject.productCustomerENAddress1 = productCustomerENAddress[3])
         : null;
       // 住所1（英語）
-      productCustomerENAddress2
+      productCustomerENAddress[2]
         ? (orderDetailObject.productCustomerENAddress2 = productCustomerENAddress[2])
         : null;
       // 住所1（英語）
-      productCustomerENAddress3
+      productCustomerENAddress[1]
         ? (orderDetailObject.productCustomerENAddress3 = productCustomerENAddress[1])
         : null;
       // 住所1（英語）
-      productCustomerENAddress4
+      productCustomerENAddress[0]
         ? (orderDetailObject.productCustomerENAddress4 = productCustomerENAddress[0])
         : null;
       // 携帯番号
@@ -220,6 +214,12 @@ async function buymaOrderDetail(transactionID) {
 
     // 取引ID
     orderDetailObject.transactionID = transactionID;
+
+    // 2022/04/23 商品種類(英語),価格(ドル),商品重さ(g),コメント를 취득
+    orderDetailObject.productTypeEN = googleProfitObject.productTypeEN;
+    orderDetailObject.productPriceEN = googleProfitObject.productPriceEN;
+    orderDetailObject.productWeight = googleProfitObject.productWeight;
+    orderDetailObject.comment = googleProfitObject.comment;
 
     await page.close();
     await browser.close();

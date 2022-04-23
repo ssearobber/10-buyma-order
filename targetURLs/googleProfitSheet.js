@@ -35,6 +35,10 @@ async function googleProfitSheet(productId) {
       googleProfitObject.shipProfit = rows[i].shipProfit.replace(/[^0-9]/g, '');
       googleProfitObject.EMSProfit = rows[i].EMSProfit.replace(/[^0-9]/g, '');
       googleProfitObject.qxpressProfit = rows[i].qxpressProfit.replace(/[^0-9]/g, '');
+      googleProfitObject.productTypeEN = rows[i].productTypeEN;
+      googleProfitObject.productPriceEN = rows[i].productPriceEN;
+      googleProfitObject.productWeight = rows[i].productWeight;
+      googleProfitObject.comment = rows[i].comment;
     }
   }
 
