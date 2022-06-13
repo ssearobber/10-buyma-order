@@ -188,6 +188,8 @@ async function buymaOrderDetail(transactionID) {
         else if (productDeliveryMethod[0] == '25')
           orderDetailObject.productDeliveryMethod = 'ems'; // 중국으로부터 오는 유리테이블
         else if (productDeliveryMethod[0] == '30') orderDetailObject.productDeliveryMethod = 'ship';
+        else if (productDeliveryMethod[0] == '7')
+          orderDetailObject.productDeliveryMethod = 'yamato';
       }
 
       return orderDetailObject;
@@ -211,6 +213,9 @@ async function buymaOrderDetail(transactionID) {
     else if (orderDetailObject.productDeliveryMethod == 'ship')
       orderDetailObject.productProfit =
         googleProfitObject.shipProfit * orderDetailObject.productCount;
+    else if (orderDetailObject.productDeliveryMethod == 'yamato')
+      orderDetailObject.productProfit =
+        googleProfitObject.yamatoProfit * orderDetailObject.productCount;
 
     // 取引ID
     orderDetailObject.transactionID = transactionID;
