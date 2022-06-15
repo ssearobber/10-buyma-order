@@ -113,9 +113,15 @@ async function buymaOrderDetail(transactionID) {
         productColor = document.querySelector('table tbody tr:nth-of-type(17) td')?.innerText;
       }
 
+      // 通常뒤의 숫자하나 취득
       let productDeliveryMethod = document
         .querySelector('table tbody tr:nth-of-type(12) td')
         ?.innerText.match(/(?<=通常)\d{1,2}/g);
+
+      // ヤマト運輸, 韓国郵便局을 취득
+      let yamatoAndEmsDeliveryMethod = document
+        .querySelector('table tbody tr:nth-of-type(12) td')
+        ?.innerText.match(/(?<=配送方法：)\D{1,5}/g);
 
       // 商品ID
       productId ? (orderDetailObject.productId = '00' + productId[0]) : null;
@@ -182,13 +188,14 @@ async function buymaOrderDetail(transactionID) {
       // 配送方法
       if (productDeliveryMethod) {
         if (productDeliveryMethod[0] == '4') orderDetailObject.productDeliveryMethod = '国内発送';
-        else if (productDeliveryMethod[0] == '5') orderDetailObject.productDeliveryMethod = 'ems';
+        else if (productDeliveryMethod[0] == '7' && yamatoAndEmsDeliveryMethod == '韓国郵便局')
+          orderDetailObject.productDeliveryMethod = 'ems';
         else if (productDeliveryMethod[0] == '12')
           orderDetailObject.productDeliveryMethod = 'qxpress';
         else if (productDeliveryMethod[0] == '25')
           orderDetailObject.productDeliveryMethod = 'ems'; // 중국으로부터 오는 유리테이블
         else if (productDeliveryMethod[0] == '30') orderDetailObject.productDeliveryMethod = 'ship';
-        else if (productDeliveryMethod[0] == '7')
+        else if (productDeliveryMethod[0] == '7' && yamatoAndEmsDeliveryMethod == 'ヤマト運輸')
           orderDetailObject.productDeliveryMethod = 'yamato';
       }
 
