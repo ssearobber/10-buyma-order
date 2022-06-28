@@ -123,6 +123,11 @@ async function buymaOrderDetail(transactionID) {
         .querySelector('table tbody tr:nth-of-type(12) td')
         ?.innerText.match(/(?<=配送方法：)\D{1,5}/g);
 
+      // 発送期限日 취득
+      let productDeadlineDate = document
+        .querySelector('table tbody tr:nth-of-type(6) td')
+        .innerText.match(/^\d{4}\/(0[1-9]|1[012])\/(0[1-9]|[12][0-9]|3[01])/g);
+
       // 商品ID
       productId ? (orderDetailObject.productId = '00' + productId[0]) : null;
       // お客様氏名（日本語）
@@ -198,6 +203,8 @@ async function buymaOrderDetail(transactionID) {
         else if (productDeliveryMethod[0] == '7' && yamatoAndEmsDeliveryMethod == 'ヤマト運輸')
           orderDetailObject.productDeliveryMethod = 'yamato';
       }
+      // 発送期限日
+      productDeadlineDate ? (orderDetailObject.productDeadlineDate = productDeadlineDate[0]) : null;
 
       return orderDetailObject;
     });

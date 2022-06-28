@@ -65,6 +65,7 @@ async function googleOrderSheet(transactionID) {
         rows[i].productPriceEN = orderDetailObject.productPriceEN;
         rows[i].productWeight = orderDetailObject.productWeight;
         rows[i].comment = orderDetailObject.comment;
+        rows[i].productDeadlineDate = orderDetailObject.productDeadlineDate;
 
         rows[i].save();
         break;
