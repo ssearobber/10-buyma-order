@@ -46,6 +46,7 @@ async function googleOrderSheet(transactionID) {
         rows[i].transactionID = orderDetailObject.transactionID;
         rows[i].productOrderDate = orderDetailObject.productOrderDate;
         rows[i].rowNum = orderDetailObject.rowNum;
+        rows[i].peculiarities = orderDetailObject.peculiarities;
         rows[i].productURL = orderDetailObject.productURL;
         rows[i].productCount = orderDetailObject.productCount;
         rows[i].productColor = orderDetailObject.productColor;

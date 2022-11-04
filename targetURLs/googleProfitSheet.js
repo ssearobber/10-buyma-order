@@ -31,6 +31,7 @@ async function googleProfitSheet(productId) {
     // 해당 商品ID가 존재하는 row
     if (rows[i].productId.match(/\d{10}/g) == productId) {
       googleProfitObject.rowNum = i + 2;
+      googleProfitObject.peculiarities = rows[i].peculiarities;
       googleProfitObject.productURL = rows[i].productURL;
       googleProfitObject.shipProfit = rows[i].shipProfit.replace(/[^0-9]/g, '');
       googleProfitObject.EMSProfit = rows[i].EMSProfit.replace(/[^0-9]/g, '');
