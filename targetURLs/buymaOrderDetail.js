@@ -240,6 +240,9 @@ async function buymaOrderDetail(transactionID) {
     orderDetailObject.productWeight = googleProfitObject.productWeight;
     orderDetailObject.comment = googleProfitObject.comment;
 
+    // 2022/11/08 特異事項 추가
+    orderDetailObject.peculiarities = googleProfitObject.peculiarities;
+
     await page.close();
     await browser.close();
     console.log('주문정보 상세 크롤링 종료.');
