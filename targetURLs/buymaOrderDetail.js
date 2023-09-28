@@ -204,7 +204,7 @@ async function buymaOrderDetail(transactionID) {
         else if (productDeliveryMethod[0] == '7' && yamatoAndEmsAndKseDeliveryMethod == 'ヤマト運輸')
           orderDetailObject.productDeliveryMethod = 'yamato';
         else if (productDeliveryMethod[0] == '7' && yamatoAndEmsAndKseDeliveryMethod == 'KSE e')
-          orderDetailObject.productDeliveryMethod = 'KSE';
+          orderDetailObject.productDeliveryMethod = 'KSE'; // 2023/9/26 KSE 추가
       }
       // 発送期限日
       productDeadlineDate ? (orderDetailObject.productDeadlineDate = productDeadlineDate[0]) : null;
@@ -233,6 +233,9 @@ async function buymaOrderDetail(transactionID) {
     else if (orderDetailObject.productDeliveryMethod == 'yamato')
       orderDetailObject.productProfit =
         googleProfitObject.yamatoProfit * orderDetailObject.productCount;
+    else if (orderDetailObject.productDeliveryMethod == 'KSE')  // 2023/9/26 KSE 추가
+        orderDetailObject.productProfit =
+          googleProfitObject.kseProfit * orderDetailObject.productCount;
 
     // 取引ID
     orderDetailObject.transactionID = transactionID;
