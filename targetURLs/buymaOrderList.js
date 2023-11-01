@@ -28,10 +28,10 @@ async function buymaOrderList() {
     //     height: 1080,
     // });
     await page.setDefaultNavigationTimeout(0);
-    // await page.goto('https://www.buyma.com/my/buyerorders/?kw=&sts[]=0');
-    await page.goto('https://www.buyma.com/my/orders/search?statuses%5Bplaced%5D=true&statuses%5Bshipped%5D=false&statuses%5Bpre_order%5D=false&keyword=&memo_only=false&order_id=&brand_id=&shop_url=&stock_status=any&shipping_id=&placed_from=&placed_to=&shipped_from=&shipped_to=&claim_answers%5Bnot_arrived%5D=false&claim_answers%5Bothers%5D=false&repeater=false&speed_delivery=false&duties_on_shopper=false&rows=20&page=1&sort=placed_date&order=desc', {
-      waitUntil: 'networkidle0'
-    });
+    await page.goto('https://www.buyma.com/my/buyerorders/?kw=&sts[]=0', { waitUntil: 'networkidle0' });
+    // await page.goto('https://www.buyma.com/my/orders/search?statuses%5Bplaced%5D=true&statuses%5Bshipped%5D=false&statuses%5Bpre_order%5D=false&keyword=&memo_only=false&order_id=&brand_id=&shop_url=&stock_status=any&shipping_id=&placed_from=&placed_to=&shipped_from=&shipped_to=&claim_answers%5Bnot_arrived%5D=false&claim_answers%5Bothers%5D=false&repeater=false&speed_delivery=false&duties_on_shopper=false&rows=20&page=1&sort=placed_date&order=desc', {
+    //   waitUntil: 'networkidle0'
+    // });
 
     // 로그인 작업 건너뛰기
     if (await page.$('.user_name')) {
