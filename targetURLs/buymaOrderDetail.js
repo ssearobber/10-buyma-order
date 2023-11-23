@@ -91,7 +91,7 @@ async function buymaOrderDetail(transactionID) {
       // 2023/11/23 update 쿠폰사용인 경우 분기처리
       let productOrderDate;
       let productColor;
-      if (document.querySelector('table tbody tr:nth-of-type(14) tr')?.innerHTML.match(/使用クーポン/g)) {
+      if (document.querySelector('table tbody tr:nth-of-type(14) th')?.innerHTML.match(/使用クーポン/g)) {
         if (
           document.querySelector('table tbody tr:nth-of-type(15) td')?.innerHTML.match(/コンビニ/g)
         ) {
