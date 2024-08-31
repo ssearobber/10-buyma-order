@@ -6,7 +6,7 @@ async function loadPage(browser, url, retries = 5) {
   const page = await browser.newPage();
   for (let i = 0; i < retries; i++) {
     try {
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
+      await page.goto(url, { waitUntil: 'networkidle0', timeout: 100000 });
       return page;
     } catch (error) {
       console.error('Retry loading:', i + 1);
@@ -48,7 +48,7 @@ async function buymaOrderList() {
     page = await loadPage(browser, 'https://www.buyma.com/my/buyerorders/?kw=&sts[]=0');
 
     // 크롤링 로직
-    console.log('取引ID 취득');
+    console.log('取引ID 취득 시작');
     transactionIDArray = await page.evaluate(() => {
       const tags = document.querySelectorAll('table tbody tr td:nth-of-type(4) p:nth-of-type(2) a');
       return Array.from(tags).map(t => ({ transactionID: t.textContent }));
