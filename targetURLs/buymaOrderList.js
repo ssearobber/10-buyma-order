@@ -55,6 +55,7 @@ async function buymaOrderList() {
     });
 
     console.log('取引ID 크롤링 종료.');
+    console.log('취득한 取引ID : ', transactionIDArray);
     return transactionIDArray;
   } catch (e) {
     console.error(e);
