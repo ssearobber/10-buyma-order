@@ -41,7 +41,7 @@ async function buymaOrderList() {
         document.querySelector('#login_do').click();
       }, id, password);
       console.log('로그인했습니다.');
-      await page.waitForTimeout(10000); // 로그인 로딩 기다림
+      await page.waitForTimeout(20000); // 로그인 로딩 기다림
     }
 
     // 주문 페이지 재시도 로드
