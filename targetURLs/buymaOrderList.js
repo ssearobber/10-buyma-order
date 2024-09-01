@@ -4,6 +4,10 @@ const path = require('path');
 // 페이지 로드 함수
 async function loadPage(browser, url, retries = 5) {
   const page = await browser.newPage();
+  // User-Agent 설정 추가
+  const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
+  await page.setUserAgent(userAgent);
+
   for (let i = 0; i < retries; i++) {
     try {
       await page.goto(url, { waitUntil: 'networkidle0', timeout: 100000 });
@@ -30,9 +34,6 @@ async function buymaOrderList() {
       userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
     });
 
-    // User-Agent 설정 추가
-    const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
-    await page.setUserAgent(userAgent);
     // 로그인 페이지 로드
     page = await loadPage(browser, 'https://www.buyma.com/login/');
     if (await page.$('.user_name')) {
@@ -46,7 +47,7 @@ async function buymaOrderList() {
       console.log('로그인했습니다.');
       await page.waitForTimeout(20000); // 로그인 로딩 기다림
     }
-    await page.waitForSelector('user_name', {
+    await page.waitForSelector('.user_name', {
       visible: true,
       timeout: 30000 // 30초 동안 해당 요소가 나타나길 기다립니다.
     });
