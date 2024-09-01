@@ -52,13 +52,19 @@ async function buymaOrderList() {
       console.log('이미 로그인 되어 있습니다.');
     } else {
       console.log('로그인 시도...');
-      console.log('id : ', id);
-      console.log('password : ', password);
       await page.evaluate((id, password) => {
-        document.querySelector('#txtLoginId').value = id;
-        document.querySelector('#txtLoginPass').value = password;
-        document.querySelector('#login_do').click();
-      }, id, password);
+        const loginIdElement = document.querySelector('#txtLoginId');
+        const loginPassElement = document.querySelector('#txtLoginPass');
+        const loginButtonElement = document.querySelector('#login_do');
+    
+        if (loginIdElement && loginPassElement && loginButtonElement) {
+            loginIdElement.value = id;
+            loginPassElement.value = password;
+            loginButtonElement.click();
+        } else {
+            throw new Error('Login form elements not found');
+        }
+    }, id, password);
       console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
       // await page.waitForTimeout(20000); // 로그인 로딩 기다림
     }
