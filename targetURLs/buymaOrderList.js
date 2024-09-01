@@ -37,15 +37,15 @@ async function buymaOrderList() {
     // 로그인 페이지 로드
     page = await loadPage(browser, 'https://www.buyma.com/login/');
     await page.waitForSelector('#txtLoginId', {
-      visible: false,
+      visible: true,
       timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
     });
     await page.waitForSelector('#txtLoginPass', {
-      visible: false,
+      visible: true,
       timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
     });
     await page.waitForSelector('#login_do', {
-      visible: false,
+      visible: true,
       timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
     });
     if (await page.$('.user_name')) {
@@ -60,7 +60,10 @@ async function buymaOrderList() {
         if (loginIdElement && loginPassElement && loginButtonElement) {
             loginIdElement.value = id;
             loginPassElement.value = password;
-            loginButtonElement.click();
+            // 3초(3000ms) 후에 로그인 버튼을 클릭하도록 설정
+        setTimeout(() => {
+              loginButtonElement.click();
+          }, 3000);
         } else {
             throw new Error('Login form elements not found');
         }
