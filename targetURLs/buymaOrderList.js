@@ -61,13 +61,21 @@ async function buymaOrderList() {
             loginIdElement.value = id;
             loginPassElement.value = password;
             // 3초(3000ms) 후에 로그인 버튼을 클릭하도록 설정
-        setTimeout(() => {
-              loginButtonElement.click();
-          }, 3000);
+            setTimeout(() => {
+                  loginButtonElement.click();
+            }, 3000);
+            return {
+              loginIdElementHtml: loginIdElement.outerHTML,
+              loginPassElementHtml: loginPassElement.outerHTML,
+              loginButtonElementHtml: loginButtonElement.outerHTML
+          };
         } else {
             throw new Error('Login form elements not found');
         }
     }, id, password);
+      console.log('Login ID Element HTML:', elementsInfo.loginIdElementHtml);
+      console.log('Login Pass Element HTML:', elementsInfo.loginPassElementHtml);
+      console.log('Login Button Element HTML:', elementsInfo.loginButtonElementHtml);
       console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
       // await page.waitForTimeout(20000); // 로그인 로딩 기다림
     }
