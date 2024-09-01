@@ -87,11 +87,13 @@ async function buymaOrderList() {
       console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
     }
 
-    await page.goto('https://www.buyma.com/my/', { waitUntil: 'networkidle0' });
-    await page.waitForSelector('.user_name', {
-      visible: true,
-      timeout: 60000 // 1분 동안 해당 요소가 나타나길 기다립니다.
-    });
+    // 페이지 로드 대기
+    await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 60000 });
+
+    if (!(await page.$('.user_name'))) {
+      console.error('로그인 실패: .user_name 요소를 찾을 수 없습니다.');
+      return;
+    }
 
     // 주문 페이지 재시도 로드
     page = await loadPage(browser, 'https://www.buyma.com/my/buyerorders/?kw=&sts[]=0');
