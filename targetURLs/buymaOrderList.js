@@ -45,11 +45,11 @@ async function buymaOrderList() {
         document.querySelector('#login_do').click();
       }, id, password);
       console.log('로그인했습니다.');
-      await page.waitForTimeout(20000); // 로그인 로딩 기다림
+      // await page.waitForTimeout(20000); // 로그인 로딩 기다림
     }
     await page.waitForSelector('.user_name', {
       visible: true,
-      timeout: 30000 // 30초 동안 해당 요소가 나타나길 기다립니다.
+      timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
     });
 
     // 주문 페이지 재시도 로드
