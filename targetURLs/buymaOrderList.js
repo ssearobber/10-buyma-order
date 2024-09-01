@@ -46,6 +46,7 @@ async function buymaOrderList() {
 
     // 주문 페이지 재시도 로드
     page = await loadPage(browser, 'https://www.buyma.com/my/buyerorders/?kw=&sts[]=0');
+    await page.waitForTimeout(10000);
 
     // 크롤링 로직
     console.log('取引ID 취득 시작');
