@@ -29,7 +29,7 @@ async function buymaOrderList() {
 
   try {
     browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       // userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
     });
