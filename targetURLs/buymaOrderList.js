@@ -36,6 +36,8 @@ async function buymaOrderList() {
 
     // 로그인 페이지 로드
     page = await loadPage(browser, 'https://www.buyma.com/login/');
+    await page.setCacheEnabled(false);
+    await page.reload({ waitUntil: 'networkidle0' });
     await page.waitForSelector('#txtLoginId', {
       visible: true,
       timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
