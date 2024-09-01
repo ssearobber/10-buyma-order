@@ -81,6 +81,7 @@ async function buymaOrderList() {
       console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
     }
 
+    await page.goto('https://www.buyma.com/my/', { waitUntil: 'networkidle0' });
     await page.waitForSelector('.user_name', {
       visible: true,
       timeout: 60000 // 1분 동안 해당 요소가 나타나길 기다립니다.
