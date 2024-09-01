@@ -30,11 +30,11 @@ async function buymaOrderList() {
       userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
     });
 
-    // 로그인 페이지 로드
-    page = await loadPage(browser, 'https://www.buyma.com/login/');
     // User-Agent 설정 추가
     const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
     await page.setUserAgent(userAgent);
+    // 로그인 페이지 로드
+    page = await loadPage(browser, 'https://www.buyma.com/login/');
     if (await page.$('.user_name')) {
       console.log('이미 로그인 되어 있습니다.');
     } else {
