@@ -7,6 +7,12 @@ async function loadPage(browser, url, retries = 5) {
   // User-Agent 설정 추가
   const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
   await page.setUserAgent(userAgent);
+  // 페이지가 로드되기 전에 헤드리스 브라우저 감지 방지 설정 추가
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'webdriver', {
+      get: () => false,
+    });
+  });
 
   for (let i = 0; i < retries; i++) {
     try {
@@ -32,13 +38,6 @@ async function buymaOrderList() {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       // userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
-    });
-
-    // 페이지가 로드되기 전에 헤드리스 브라우저 감지 방지 설정 추가
-    await page.evaluateOnNewDocument(() => {
-      Object.defineProperty(navigator, 'webdriver', {
-        get: () => false,
-      });
     });
 
     // 로그인 페이지 로드
