@@ -54,7 +54,7 @@ async function buymaOrderList() {
     }
     await page.waitForSelector('.user_name', {
       visible: true,
-      timeout: 150000 // 150초 동안 해당 요소가 나타나길 기다립니다.
+      timeout: 300000 // 5분 동안 해당 요소가 나타나길 기다립니다.
     });
 
     // 주문 페이지 재시도 로드
