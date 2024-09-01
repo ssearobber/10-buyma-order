@@ -47,9 +47,6 @@ async function buymaOrderList() {
       await page.waitForTimeout(20000); // 로그인 로딩 기다림
     }
 
-    // waitForSelector를 사용한 로그인 성공 확인
-    await page.waitForSelector('로그인 후 확인할 수 있는 요소의 선택자', {timeout: 30000});
-
     // 주문 페이지 재시도 로드
     page = await loadPage(browser, 'https://www.buyma.com/my/buyerorders/?kw=&sts[]=0');
     // await page.waitForTimeout(10000);  // 주문 로딩 기다림
