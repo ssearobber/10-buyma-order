@@ -43,12 +43,13 @@ async function buymaOrderList() {
     if (await page.$('.user_name')) {
       console.log('이미 로그인 되어 있습니다.');
     } else {
+      console.log('로그인 시도...');
       await page.evaluate((id, password) => {
         document.querySelector('#txtLoginId').value = id;
         document.querySelector('#txtLoginPass').value = password;
         document.querySelector('#login_do').click();
       }, id, password);
-      console.log('로그인했습니다.');
+      console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
       // await page.waitForTimeout(20000); // 로그인 로딩 기다림
     }
     await page.waitForSelector('.user_name', {
