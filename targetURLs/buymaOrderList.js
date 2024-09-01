@@ -40,10 +40,20 @@ async function buymaOrderList() {
       visible: false,
       timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
     });
+    await page.waitForSelector('#txtLoginPass', {
+      visible: false,
+      timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
+    });
+    await page.waitForSelector('#login_do', {
+      visible: false,
+      timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
+    });
     if (await page.$('.user_name')) {
       console.log('이미 로그인 되어 있습니다.');
     } else {
       console.log('로그인 시도...');
+      console.log('id : ', id);
+      console.log('password : ', password);
       await page.evaluate((id, password) => {
         document.querySelector('#txtLoginId').value = id;
         document.querySelector('#txtLoginPass').value = password;
@@ -52,10 +62,7 @@ async function buymaOrderList() {
       console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
       // await page.waitForTimeout(20000); // 로그인 로딩 기다림
     }
-    await page.waitForSelector('#txtLoginId', {
-      visible: true,
-      timeout: 100000 // 5분 동안 해당 요소가 나타나길 기다립니다.
-    });
+
     await page.waitForSelector('.user_name', {
       visible: true,
       timeout: 300000 // 5분 동안 해당 요소가 나타나길 기다립니다.
