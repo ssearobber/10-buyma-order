@@ -36,6 +36,10 @@ async function buymaOrderList() {
 
     // 로그인 페이지 로드
     page = await loadPage(browser, 'https://www.buyma.com/login/');
+    await page.waitForSelector('#txtLoginId', {
+      visible: true,
+      timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
+    });
     if (await page.$('.user_name')) {
       console.log('이미 로그인 되어 있습니다.');
     } else {
