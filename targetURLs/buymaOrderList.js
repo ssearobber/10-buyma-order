@@ -52,7 +52,7 @@ async function buymaOrderList() {
       console.log('이미 로그인 되어 있습니다.');
     } else {
       console.log('로그인 시도...');
-      await page.evaluate((id, password) => {
+      const elementsInfo =await page.evaluate((id, password) => {
         const loginIdElement = document.querySelector('#txtLoginId');
         const loginPassElement = document.querySelector('#txtLoginPass');
         const loginButtonElement = document.querySelector('#login_do');
