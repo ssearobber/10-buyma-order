@@ -26,7 +26,7 @@ async function buymaOrderList() {
   try {
     browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
       userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
     });
 
@@ -46,7 +46,7 @@ async function buymaOrderList() {
 
     // 주문 페이지 재시도 로드
     page = await loadPage(browser, 'https://www.buyma.com/my/buyerorders/?kw=&sts[]=0');
-    await page.waitForTimeout(10000);
+    await page.waitForTimeout(10000);  // 주문 로딩 기다림
 
     // 크롤링 로직
     console.log('取引ID 취득 시작');
