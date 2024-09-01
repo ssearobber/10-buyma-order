@@ -34,6 +34,13 @@ async function buymaOrderList() {
       // userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
     });
 
+    // 페이지가 로드되기 전에 헤드리스 브라우저 감지 방지 설정 추가
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => false,
+      });
+    });
+
     // 로그인 페이지 로드
     page = await loadPage(browser, 'https://www.buyma.com/login/');
     await page.setCacheEnabled(false);
