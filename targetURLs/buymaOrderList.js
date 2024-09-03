@@ -8,11 +8,11 @@ async function loadPage(browser, url, retries = 5) {
   const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
   await page.setUserAgent(userAgent);
   // 페이지가 로드되기 전에 헤드리스 브라우저 감지 방지 설정 추가
-  await page.evaluateOnNewDocument(() => {
-    Object.defineProperty(navigator, 'webdriver', {
-      get: () => false,
-    });
-  });
+  // await page.evaluateOnNewDocument(() => {
+  //   Object.defineProperty(navigator, 'webdriver', {
+  //     get: () => false,
+  //   });
+  // });
 
   for (let i = 0; i < retries; i++) {
     try {
@@ -35,15 +35,15 @@ async function buymaOrderList() {
 
   try {
     browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       // userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
     });
 
     // 로그인 페이지 로드
     page = await loadPage(browser, 'https://www.buyma.com/login/');
-    await page.setCacheEnabled(false);
-    await page.reload({ waitUntil: 'networkidle0' });
+    // await page.setCacheEnabled(false);
+    // await page.reload({ waitUntil: 'networkidle0' });
     await page.waitForSelector('#txtLoginId', {
       visible: true,
       timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
@@ -60,40 +60,118 @@ async function buymaOrderList() {
       console.log('이미 로그인 되어 있습니다.');
     } else {
       console.log('로그인 시도...');
-      const elementsInfo =await page.evaluate((id, password) => {
-        const loginIdElement = document.querySelector('#txtLoginId');
-        const loginPassElement = document.querySelector('#txtLoginPass');
-        const loginButtonElement = document.querySelector('#login_do');
+    //   const elementsInfo =await page.evaluate((id, password) => {
+    //     const loginIdElement = document.querySelector('#txtLoginId');
+    //     const loginPassElement = document.querySelector('#txtLoginPass');
+    //     const loginButtonElement = document.querySelector('#login_do');
     
-        if (loginIdElement && loginPassElement && loginButtonElement) {
-            loginIdElement.value = id;
-            loginPassElement.value = password;
-            // 3초(3000ms) 후에 로그인 버튼을 클릭하도록 설정
-            setTimeout(() => {
-                  loginButtonElement.click();
-            }, 3000);
-            return {
+    //     if (loginIdElement && loginPassElement && loginButtonElement) {
+    //         loginIdElement.value = id;
+    //         loginPassElement.value = password;
+    //         loginButtonElement.click();
+    //         return {
+    //           loginIdElementHtml: loginIdElement.outerHTML,
+    //           loginPassElementHtml: loginPassElement.outerHTML,
+    //           loginButtonElementHtml: loginButtonElement.outerHTML
+    //       };
+    //     } else {
+    //         throw new Error('Login form elements not found');
+    //     }
+    // }, id, password);
+    //   console.log('Login ID Element HTML:', elementsInfo.loginIdElementHtml);
+    //   console.log('Login Pass Element HTML:', elementsInfo.loginPassElementHtml);
+    //   console.log('Login Button Element HTML:', elementsInfo.loginButtonElementHtml);
+    //   console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
+    const elementsInfo = await page.evaluate(() => {
+      const loginIdElement = document.querySelector('#txtLoginId');
+      const loginPassElement = document.querySelector('#txtLoginPass');
+      const loginButtonElement = document.querySelector('#login_do');
+  
+      if (loginIdElement && loginPassElement && loginButtonElement) {
+          return {
               loginIdElementHtml: loginIdElement.outerHTML,
               loginPassElementHtml: loginPassElement.outerHTML,
               loginButtonElementHtml: loginButtonElement.outerHTML
           };
-        } else {
-            throw new Error('Login form elements not found');
-        }
-    }, id, password);
-      console.log('Login ID Element HTML:', elementsInfo.loginIdElementHtml);
-      console.log('Login Pass Element HTML:', elementsInfo.loginPassElementHtml);
-      console.log('Login Button Element HTML:', elementsInfo.loginButtonElementHtml);
-      console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
+      } else {
+          throw new Error('Login form elements not found');
+      }
+  });
+  
+  console.log('Login ID Element HTML:', elementsInfo.loginIdElementHtml);
+  console.log('Login Pass Element HTML:', elementsInfo.loginPassElementHtml);
+  console.log('Login Button Element HTML:', elementsInfo.loginButtonElementHtml);
+  console.log('로그인 정보 입력 중...');
+  
+  // Step 1: ID 입력
+  await page.evaluate((id) => {
+      const loginIdElement = document.querySelector('#txtLoginId');
+      loginIdElement.value = id;
+  }, id);
+  
+  // 잠시 대기 (1초 정도, 필요에 따라 조절)
+  await page.waitForTimeout(1000);
+  
+  // Step 2: Password 입력
+  await page.evaluate((password) => {
+      const loginPassElement = document.querySelector('#txtLoginPass');
+      loginPassElement.value = password;
+  }, password);
+  
+  // 잠시 대기 (1초 정도, 필요에 따라 조절)
+  await page.waitForTimeout(1000);
+  
+  // Step 3: 로그인 버튼 클릭
+  // await page.evaluate(() => {
+  //     const loginButtonElement = document.querySelector('#login_do');
+  //     loginButtonElement.click();
+  // });
+  await page.evaluate(() => {
+    const loginButtonElement = document.querySelector('#login_do');
+    const rect = loginButtonElement.getBoundingClientRect();
+    const x = rect.left + (rect.width / 2);
+    const y = rect.top + (rect.height / 2);
+
+    loginButtonElement.dispatchEvent(new MouseEvent('mousedown', {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        clientX: x,
+        clientY: y
+    }));
+
+    loginButtonElement.dispatchEvent(new MouseEvent('mouseup', {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        clientX: x,
+        clientY: y
+    }));
+
+    loginButtonElement.dispatchEvent(new MouseEvent('click', {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        clientX: x,
+        clientY: y
+    }));
+});
+  
+  console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
     }
+
+    await page.waitForSelector('.user_name', {
+      visible: true,
+      timeout: 300000 // 5분으로 타임아웃을 늘립니다.
+    });
 
     // 페이지 로드 대기
-    await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 60000 });
+    // await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 60000 });
 
-    if (!(await page.$('.user_name'))) {
-      console.error('로그인 실패: .user_name 요소를 찾을 수 없습니다.');
-      return;
-    }
+    // if (!(await page.$('.user_name'))) {
+    //   console.error('로그인 실패: .user_name 요소를 찾을 수 없습니다.');
+    //   return;
+    // }
 
     // 주문 페이지 재시도 로드
     page = await loadPage(browser, 'https://www.buyma.com/my/buyerorders/?kw=&sts[]=0');
