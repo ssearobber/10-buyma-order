@@ -95,8 +95,17 @@ async function buymaOrderList() {
     // Wait for a few seconds before entering the password again
     await page.waitForTimeout(3000); // Wait for 3 seconds
 
+    // Clear the password input field
+    await page.evaluate(() => {
+      const loginPassElement = document.querySelector('#txtLoginPass');
+      if (loginPassElement) {
+          loginPassElement.value = ''; // Clear the password field
+      }
+    });
+    console.log('Password field cleared.');
+
     // Type the password again slowly with delay
-    // await page.type('#txtLoginPass', password, { delay: 100 }); // Typing password again with 100ms delay between keystrokes
+    await page.type('#txtLoginPass', password, { delay: 100 }); // Typing password again with 100ms delay between keystrokes
 
     // Now click the login button
     // await page.click('#login_do');
