@@ -39,7 +39,7 @@ async function buymaOrderList() {
 
   try {
     browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       // userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
     });
@@ -70,8 +70,8 @@ async function buymaOrderList() {
         const loginButtonElement = document.querySelector('#login_do');
     
         if (loginIdElement && loginPassElement && loginButtonElement) {
-            loginIdElement.value = id;
-            loginPassElement.value = password;
+            // loginIdElement.value = id;
+            // loginPassElement.value = password;
             return {
                 loginIdElementHtml: loginIdElement.outerHTML,
                 loginPassElementHtml: loginPassElement.outerHTML,
@@ -83,14 +83,37 @@ async function buymaOrderList() {
     }, id, password);
     
     console.log('Login form elements:', elementsInfo);
-    
-    // Simulate a human-like delay before clicking login
-    await page.waitForTimeout(3000); // Wait for 3 seconds before clicking
+
+    // Type the login ID and password slowly
+    await page.type('#txtLoginId', id, { delay: 150 }); // Typing ID with 100ms delay between keystrokes
+    await page.waitForTimeout(1000); // Wait for 1 second before typing the password
+
+    await page.type('#txtLoginPass', password, { delay: 150 }); // Typing password with 100ms delay between keystrokes
+
+    console.log('Login ID and Password typed slowly.');
+
+    // Wait for a few seconds before entering the password again
+    await page.waitForTimeout(3000); // Wait for 3 seconds
+
+    // Type the password again slowly with delay
+    // await page.type('#txtLoginPass', password, { delay: 100 }); // Typing password again with 100ms delay between keystrokes
+
+    // Now click the login button
+    // await page.click('#login_do');
+
+    // Enter the password again with the delay
+  //   await page.evaluate((password) => {
+  //     const loginPassElement = document.querySelector('#txtLoginPass');
+  //     if (loginPassElement) {
+  //         loginPassElement.value = password; // Second password entry
+  //     }
+  // }, password);
     
     // await page.evaluate(() => {
     //     const loginButtonElement = document.querySelector('#login_do');
     //     loginButtonElement.click();
     // });
+
       await page.evaluate(() => {
     const loginButtonElement = document.querySelector('#login_do');
     const rect = loginButtonElement.getBoundingClientRect();
@@ -120,7 +143,38 @@ async function buymaOrderList() {
         clientX: x,
         clientY: y
     }));
-});
+    });
+
+    // const loginButtonElement = await page.$('#login_do');
+    // await loginButtonElement.click();
+    // const loginButtonElement = await page.$('#login_do');
+    // const boundingBox = await loginButtonElement.boundingBox();
+
+    // await page.mouse.move(
+    //     boundingBox.x + boundingBox.width / 2,
+    //     boundingBox.y + boundingBox.height / 2
+    // );
+    // await page.mouse.down();
+    // await page.mouse.up();
+
+    // await page.evaluate(() => {
+    //   const form = document.querySelector('form');
+    //   form.submit();
+    // });
+
+    // const loginButtonElement = await page.$('#login_do');
+    // await loginButtonElement.click();
+
+    // await page.evaluate(() => {
+    //   const loginButtonElement = document.querySelector('#login_do');
+    //   if (loginButtonElement) {
+    //       setTimeout(() => {
+    //           loginButtonElement.click();
+    //       }, Math.random() * 3000 + 1000);  // 1초에서 4초 사이의 지연 후 클릭
+    //   } else {
+    //       throw new Error('Login button not found');
+    //   }
+    // });
     
     try {
         await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 100000 });
@@ -220,10 +274,10 @@ async function buymaOrderList() {
       // console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
     }
 
-    await page.waitForSelector('.user_name', {
-      visible: true,
-      timeout: 300000 // 5분으로 타임아웃을 늘립니다.
-    });
+    // await page.waitForSelector('.user_name', {
+    //   visible: true,
+    //   timeout: 300000 // 5분으로 타임아웃을 늘립니다.
+    // });
 
     // 페이지 로드 대기
     // await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 60000 });
