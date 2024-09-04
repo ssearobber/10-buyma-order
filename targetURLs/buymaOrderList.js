@@ -4,6 +4,10 @@ const path = require('path');
 // 페이지 로드 함수
 async function loadPage(browser, url, retries = 5) {
   const page = await browser.newPage();
+  // await page.setViewport({
+  //       width: 1280,
+  //       height: 1080,
+  //   });
   // User-Agent 설정 추가
   const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
   await page.setUserAgent(userAgent);
@@ -60,104 +64,124 @@ async function buymaOrderList() {
       console.log('이미 로그인 되어 있습니다.');
     } else {
       console.log('로그인 시도...');
-    //   const elementsInfo =await page.evaluate((id, password) => {
-    //     const loginIdElement = document.querySelector('#txtLoginId');
-    //     const loginPassElement = document.querySelector('#txtLoginPass');
-    //     const loginButtonElement = document.querySelector('#login_do');
+      const elementsInfo = await page.evaluate((id, password) => {
+        const loginIdElement = document.querySelector('#txtLoginId');
+        const loginPassElement = document.querySelector('#txtLoginPass');
+        const loginButtonElement = document.querySelector('#login_do');
     
-    //     if (loginIdElement && loginPassElement && loginButtonElement) {
-    //         loginIdElement.value = id;
-    //         loginPassElement.value = password;
-    //         loginButtonElement.click();
-    //         return {
-    //           loginIdElementHtml: loginIdElement.outerHTML,
-    //           loginPassElementHtml: loginPassElement.outerHTML,
-    //           loginButtonElementHtml: loginButtonElement.outerHTML
-    //       };
-    //     } else {
-    //         throw new Error('Login form elements not found');
-    //     }
-    // }, id, password);
-    //   console.log('Login ID Element HTML:', elementsInfo.loginIdElementHtml);
-    //   console.log('Login Pass Element HTML:', elementsInfo.loginPassElementHtml);
-    //   console.log('Login Button Element HTML:', elementsInfo.loginButtonElementHtml);
-    //   console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
-    const elementsInfo = await page.evaluate(() => {
-      const loginIdElement = document.querySelector('#txtLoginId');
-      const loginPassElement = document.querySelector('#txtLoginPass');
-      const loginButtonElement = document.querySelector('#login_do');
+        if (loginIdElement && loginPassElement && loginButtonElement) {
+            loginIdElement.value = id;
+            loginPassElement.value = password;
+            loginButtonElement.click();
+            return {
+                loginIdElementHtml: loginIdElement.outerHTML,
+                loginPassElementHtml: loginPassElement.outerHTML,
+                loginButtonElementHtml: loginButtonElement.outerHTML
+            };
+        } else {
+            throw new Error('Login form elements not found');
+        }
+    }, id, password);
+    
+    console.log('Login form elements:', elementsInfo);
+    
+    // 로그인 후 페이지 로딩 대기
+    try {
+        await page.waitForNavigation({ waitUntil: 'networkidle0' }); // 로그인 후 페이지가 완전히 로드될 때까지 대기
+    
+        // 로그인 오류 메시지 확인
+        const errElement = await page.$('.error_with_icon');
+        if (errElement) {
+            const errMessage = await page.evaluate(el => el.outerHTML, errElement);
+            console.log('Login Error Element HTML:', errMessage);
+        } else {
+            console.log('Login successful, no error message found.');
+        }
+    } catch (error) {
+        console.log('Error during login or navigation:', error);
+    }
+
+      // console.log('Login ID Element HTML:', elementsInfo.loginIdElementHtml);
+      // console.log('Login Pass Element HTML:', elementsInfo.loginPassElementHtml);
+      // console.log('Login Button Element HTML:', elementsInfo.loginButtonElementHtml);
+      // console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
+    
+  //   const elementsInfo = await page.evaluate(() => {
+  //     const loginIdElement = document.querySelector('#txtLoginId');
+  //     const loginPassElement = document.querySelector('#txtLoginPass');
+  //     const loginButtonElement = document.querySelector('#login_do');
   
-      if (loginIdElement && loginPassElement && loginButtonElement) {
-          return {
-              loginIdElementHtml: loginIdElement.outerHTML,
-              loginPassElementHtml: loginPassElement.outerHTML,
-              loginButtonElementHtml: loginButtonElement.outerHTML
-          };
-      } else {
-          throw new Error('Login form elements not found');
-      }
-  });
+  //     if (loginIdElement && loginPassElement && loginButtonElement) {
+  //         return {
+  //             loginIdElementHtml: loginIdElement.outerHTML,
+  //             loginPassElementHtml: loginPassElement.outerHTML,
+  //             loginButtonElementHtml: loginButtonElement.outerHTML
+  //         };
+  //     } else {
+  //         throw new Error('Login form elements not found');
+  //     }
+  // });
   
-  console.log('Login ID Element HTML:', elementsInfo.loginIdElementHtml);
-  console.log('Login Pass Element HTML:', elementsInfo.loginPassElementHtml);
-  console.log('Login Button Element HTML:', elementsInfo.loginButtonElementHtml);
-  console.log('로그인 정보 입력 중...');
+  // console.log('Login ID Element HTML:', elementsInfo.loginIdElementHtml);
+  // console.log('Login Pass Element HTML:', elementsInfo.loginPassElementHtml);
+  // console.log('Login Button Element HTML:', elementsInfo.loginButtonElementHtml);
+  // console.log('로그인 정보 입력 중...');
   
-  // Step 1: ID 입력
-  await page.evaluate((id) => {
-      const loginIdElement = document.querySelector('#txtLoginId');
-      loginIdElement.value = id;
-  }, id);
+  // // Step 1: ID 입력
+  // await page.evaluate((id) => {
+  //     const loginIdElement = document.querySelector('#txtLoginId');
+  //     loginIdElement.value = id;
+  // }, id);
   
-  // 잠시 대기 (1초 정도, 필요에 따라 조절)
-  await page.waitForTimeout(1000);
+  // // 잠시 대기 (1초 정도, 필요에 따라 조절)
+  // await page.waitForTimeout(1000);
   
-  // Step 2: Password 입력
-  await page.evaluate((password) => {
-      const loginPassElement = document.querySelector('#txtLoginPass');
-      loginPassElement.value = password;
-  }, password);
+  // // Step 2: Password 입력
+  // await page.evaluate((password) => {
+  //     const loginPassElement = document.querySelector('#txtLoginPass');
+  //     loginPassElement.value = password;
+  // }, password);
   
-  // 잠시 대기 (1초 정도, 필요에 따라 조절)
-  await page.waitForTimeout(1000);
+  // // 잠시 대기 (1초 정도, 필요에 따라 조절)
+  // await page.waitForTimeout(1000);
   
   // Step 3: 로그인 버튼 클릭
   // await page.evaluate(() => {
   //     const loginButtonElement = document.querySelector('#login_do');
   //     loginButtonElement.click();
   // });
-  await page.evaluate(() => {
-    const loginButtonElement = document.querySelector('#login_do');
-    const rect = loginButtonElement.getBoundingClientRect();
-    const x = rect.left + (rect.width / 2);
-    const y = rect.top + (rect.height / 2);
+//   await page.evaluate(() => {
+//     const loginButtonElement = document.querySelector('#login_do');
+//     const rect = loginButtonElement.getBoundingClientRect();
+//     const x = rect.left + (rect.width / 2);
+//     const y = rect.top + (rect.height / 2);
 
-    loginButtonElement.dispatchEvent(new MouseEvent('mousedown', {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-        clientX: x,
-        clientY: y
-    }));
+//     loginButtonElement.dispatchEvent(new MouseEvent('mousedown', {
+//         view: window,
+//         bubbles: true,
+//         cancelable: true,
+//         clientX: x,
+//         clientY: y
+//     }));
 
-    loginButtonElement.dispatchEvent(new MouseEvent('mouseup', {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-        clientX: x,
-        clientY: y
-    }));
+//     loginButtonElement.dispatchEvent(new MouseEvent('mouseup', {
+//         view: window,
+//         bubbles: true,
+//         cancelable: true,
+//         clientX: x,
+//         clientY: y
+//     }));
 
-    loginButtonElement.dispatchEvent(new MouseEvent('click', {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-        clientX: x,
-        clientY: y
-    }));
-});
+//     loginButtonElement.dispatchEvent(new MouseEvent('click', {
+//         view: window,
+//         bubbles: true,
+//         cancelable: true,
+//         clientX: x,
+//         clientY: y
+//     }));
+// });
   
-  console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
+      // console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
     }
 
     await page.waitForSelector('.user_name', {
