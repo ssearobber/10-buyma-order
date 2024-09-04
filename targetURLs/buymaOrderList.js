@@ -87,10 +87,40 @@ async function buymaOrderList() {
     // Simulate a human-like delay before clicking login
     await page.waitForTimeout(3000); // Wait for 3 seconds before clicking
     
-    await page.evaluate(() => {
-        const loginButtonElement = document.querySelector('#login_do');
-        loginButtonElement.click();
-    });
+    // await page.evaluate(() => {
+    //     const loginButtonElement = document.querySelector('#login_do');
+    //     loginButtonElement.click();
+    // });
+      await page.evaluate(() => {
+    const loginButtonElement = document.querySelector('#login_do');
+    const rect = loginButtonElement.getBoundingClientRect();
+    const x = rect.left + (rect.width / 2);
+    const y = rect.top + (rect.height / 2);
+
+    loginButtonElement.dispatchEvent(new MouseEvent('mousedown', {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        clientX: x,
+        clientY: y
+    }));
+
+    loginButtonElement.dispatchEvent(new MouseEvent('mouseup', {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        clientX: x,
+        clientY: y
+    }));
+
+    loginButtonElement.dispatchEvent(new MouseEvent('click', {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        clientX: x,
+        clientY: y
+    }));
+});
     
     try {
         await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 100000 });
