@@ -72,7 +72,6 @@ async function buymaOrderList() {
         if (loginIdElement && loginPassElement && loginButtonElement) {
             loginIdElement.value = id;
             loginPassElement.value = password;
-            loginButtonElement.click();
             return {
                 loginIdElementHtml: loginIdElement.outerHTML,
                 loginPassElementHtml: loginPassElement.outerHTML,
@@ -85,11 +84,18 @@ async function buymaOrderList() {
     
     console.log('Login form elements:', elementsInfo);
     
-    // 로그인 후 페이지 로딩 대기
-    try {
-        await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 100000 }); // 로그인 후 페이지가 완전히 로드될 때까지 대기
+    // Simulate a human-like delay before clicking login
+    await page.waitForTimeout(3000); // Wait for 3 seconds before clicking
     
-        // 로그인 오류 메시지 확인
+    await page.evaluate(() => {
+        const loginButtonElement = document.querySelector('#login_do');
+        loginButtonElement.click();
+    });
+    
+    try {
+        await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 100000 });
+    
+        // Check for login error message
         const errElement = await page.$('.error_with_icon');
         if (errElement) {
             const errMessage = await page.evaluate(el => el.outerHTML, errElement);
