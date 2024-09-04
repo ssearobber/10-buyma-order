@@ -87,7 +87,7 @@ async function buymaOrderList() {
     
     // 로그인 후 페이지 로딩 대기
     try {
-        await page.waitForNavigation({ waitUntil: 'networkidle0' }); // 로그인 후 페이지가 완전히 로드될 때까지 대기
+        await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 100000 }); // 로그인 후 페이지가 완전히 로드될 때까지 대기
     
         // 로그인 오류 메시지 확인
         const errElement = await page.$('.error_with_icon');
