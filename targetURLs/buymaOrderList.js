@@ -48,7 +48,7 @@ async function buymaOrderList() {
     browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      // userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
+      userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
     });
 
     // 로그인 페이지 로드
