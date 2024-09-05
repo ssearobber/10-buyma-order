@@ -17,6 +17,13 @@ async function loadPage(browser, url, retries = 5) {
   //     get: () => false,
   //   });
   // });
+  // 브라우저 언어 및 지역을 일본어로 설정
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'ja-JP,ja;q=0.9'
+  });
+
+  // 페이지 로딩 전 일본 시간대 설정
+  await page.emulateTimezone('Asia/Tokyo');
 
   for (let i = 0; i < retries; i++) {
     try {
