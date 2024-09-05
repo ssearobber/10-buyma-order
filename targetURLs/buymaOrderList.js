@@ -1,30 +1,49 @@
 const puppeteer = require('puppeteer');
 const path = require('path');
 
-// 페이지 로드 함수
 async function loadPage(browser, url, retries = 5) {
   const page = await browser.newPage();
-  // await page.setViewport({
-  //       width: 1280,
-  //       height: 1080,
-  //   });
-  // User-Agent 설정 추가
+
+  // User-Agent 설정 추가 (브라우저 버전과 운영 체제를 일반적인 것으로 설정)
   const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
   await page.setUserAgent(userAgent);
-  // 페이지가 로드되기 전에 헤드리스 브라우저 감지 방지 설정 추가
-  // await page.evaluateOnNewDocument(() => {
-  //   Object.defineProperty(navigator, 'webdriver', {
-  //     get: () => false,
-  //   });
-  // });
+
+  // 헤드리스 브라우저 감지 방지 설정
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'webdriver', {
+      get: () => false,
+    });
+  });
+
   // 브라우저 언어 및 지역을 일본어로 설정
   await page.setExtraHTTPHeaders({
     'Accept-Language': 'ja-JP,ja;q=0.9'
   });
 
-  // 페이지 로딩 전 일본 시간대 설정
+  // 일본 시간대 설정
   await page.emulateTimezone('Asia/Tokyo');
 
+  // 브라우저 기능 숨기기: 크롤링 감지 방지를 위해서 navigator 속성 조작
+  await page.evaluateOnNewDocument(() => {
+    // navigator 속성 수정
+    Object.defineProperty(navigator, 'language', { get: () => 'ja-JP' });
+    Object.defineProperty(navigator, 'languages', { get: () => ['ja-JP', 'ja'] });
+    Object.defineProperty(navigator, 'platform', { get: () => 'Win32' });
+
+    // WebGL 감지 방지를 위해 랜덤 렌더러와 벤더 설정
+    const getParameter = WebGLRenderingContext.prototype.getParameter;
+    WebGLRenderingContext.prototype.getParameter = function(parameter) {
+      if (parameter === 37445) {
+        return 'Google Inc.'; // 웹GL vendor spoof
+      }
+      if (parameter === 37446) {
+        return 'Google SwiftShader'; // 웹GL renderer spoof
+      }
+      return getParameter(parameter);
+    };
+  });
+
+  // 페이지 로드 시 재시도 로직
   for (let i = 0; i < retries; i++) {
     try {
       await page.goto(url, { waitUntil: 'networkidle0', timeout: 100000 });
