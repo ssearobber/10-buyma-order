@@ -86,7 +86,20 @@ async function buymaOrderList() {
 
     // Type the login ID and password slowly
     await page.type('#txtLoginId', id, { delay: 150 }); // Typing ID with 100ms delay between keystrokes
-    await page.waitForTimeout(1000); // Wait for 1 second before typing the password
+    await page.waitForTimeout(2000); // Wait for 1 second before typing the password
+
+    // Clear the ID input field
+    await page.evaluate(() => {
+      const loginPassElement = document.querySelector('#txtLoginId');
+      if (loginPassElement) {
+          loginPassElement.value = ''; // Clear the ID field
+      }
+    });
+    console.log('Id field cleared.');
+
+    // Type the login ID and password slowly
+    await page.type('#txtLoginId', id, { delay: 150 }); // Typing ID with 100ms delay between keystrokes
+    await page.waitForTimeout(2000); // Wait for 1 second before typing the password
 
     await page.type('#txtLoginPass', password, { delay: 150 }); // Typing password with 100ms delay between keystrokes
 
@@ -104,8 +117,12 @@ async function buymaOrderList() {
     });
     console.log('Password field cleared.');
 
+    await page.waitForTimeout(3000); // Wait for 3 seconds
+
     // Type the password again slowly with delay
-    await page.type('#txtLoginPass', password, { delay: 100 }); // Typing password again with 100ms delay between keystrokes
+    await page.type('#txtLoginPass', password, { delay: 150 }); // Typing password again with 100ms delay between keystrokes
+
+    await page.waitForTimeout(3000); // Wait for 3 seconds
 
     // Now click the login button
     // await page.click('#login_do');
@@ -199,32 +216,6 @@ async function buymaOrderList() {
     } catch (error) {
         console.log('Error during login or navigation:', error);
     }
-
-      // console.log('Login ID Element HTML:', elementsInfo.loginIdElementHtml);
-      // console.log('Login Pass Element HTML:', elementsInfo.loginPassElementHtml);
-      // console.log('Login Button Element HTML:', elementsInfo.loginButtonElementHtml);
-      // console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
-    
-  //   const elementsInfo = await page.evaluate(() => {
-  //     const loginIdElement = document.querySelector('#txtLoginId');
-  //     const loginPassElement = document.querySelector('#txtLoginPass');
-  //     const loginButtonElement = document.querySelector('#login_do');
-  
-  //     if (loginIdElement && loginPassElement && loginButtonElement) {
-  //         return {
-  //             loginIdElementHtml: loginIdElement.outerHTML,
-  //             loginPassElementHtml: loginPassElement.outerHTML,
-  //             loginButtonElementHtml: loginButtonElement.outerHTML
-  //         };
-  //     } else {
-  //         throw new Error('Login form elements not found');
-  //     }
-  // });
-  
-  // console.log('Login ID Element HTML:', elementsInfo.loginIdElementHtml);
-  // console.log('Login Pass Element HTML:', elementsInfo.loginPassElementHtml);
-  // console.log('Login Button Element HTML:', elementsInfo.loginButtonElementHtml);
-  // console.log('로그인 정보 입력 중...');
   
   // // Step 1: ID 입력
   // await page.evaluate((id) => {
