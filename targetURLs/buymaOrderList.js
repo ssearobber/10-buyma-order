@@ -81,6 +81,44 @@ async function buymaOrderList() {
     //     height: 1080,
     // });
     await page.setDefaultNavigationTimeout(0);
+    // User-Agent 설정 추가 (브라우저 버전과 운영 체제를 일반적인 것으로 설정)
+  const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
+  await page.setUserAgent(userAgent);
+
+  // 헤드리스 브라우저 감지 방지 설정
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'webdriver', {
+      get: () => false,
+    });
+  });
+
+  // 브라우저 언어 및 지역을 일본어로 설정
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'ja-JP,ja;q=0.9'
+  });
+
+  // 일본 시간대 설정
+  await page.emulateTimezone('Asia/Tokyo');
+
+  // 브라우저 기능 숨기기: 크롤링 감지 방지를 위해서 navigator 속성 조작
+  await page.evaluateOnNewDocument(() => {
+    // navigator 속성 수정
+    Object.defineProperty(navigator, 'language', { get: () => 'ja-JP' });
+    Object.defineProperty(navigator, 'languages', { get: () => ['ja-JP', 'ja'] });
+    Object.defineProperty(navigator, 'platform', { get: () => 'Win32' });
+
+    // WebGL 감지 방지를 위해 랜덤 렌더러와 벤더 설정
+    const getParameter = WebGLRenderingContext.prototype.getParameter;
+    WebGLRenderingContext.prototype.getParameter = function(parameter) {
+      if (parameter === 37445) {
+        return 'Google Inc.'; // 웹GL vendor spoof
+      }
+      if (parameter === 37446) {
+        return 'Google SwiftShader'; // 웹GL renderer spoof
+      }
+      return getParameter(parameter);
+    };
+  });
     await page.goto(`https://www.buyma.com/my/orders/`);
 
     // 로그인 작업 건너뛰기
