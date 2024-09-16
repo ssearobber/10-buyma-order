@@ -81,7 +81,7 @@ async function buymaOrderList() {
     //     height: 1080,
     // });
     await page.setDefaultNavigationTimeout(0);
-    await page.goto(`https://www.buyma.com/my/buyerorders/?kw=&sts[]=0`);
+    await page.goto(`https://www.buyma.com/my/orders/`);
 
     // 로그인 작업 건너뛰기
     if (await page.$('.user_name')) {
@@ -341,7 +341,7 @@ async function buymaOrderList() {
     // }
 
     // 주문 페이지 재시도 로드
-    page = await loadPage(browser, 'https://www.buyma.com/my/buyerorders/?kw=&sts[]=0');
+    page = await loadPage(browser, 'https://www.buyma.com/my/orders/');
     // await page.waitForTimeout(10000);  // 주문 로딩 기다림
     await page.waitForSelector('table tbody tr td:nth-of-type(4) p:nth-of-type(2) a', {
       visible: true,
