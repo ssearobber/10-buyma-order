@@ -87,6 +87,14 @@ async function buymaOrderList() {
       console.log('로그인했습니다.');
     }
 
+    // 주문 페이지 재시도 로드
+    await page.goto('https://www.buyma.com/my/buyerorders/?kw=&sts[]=0', { waitUntil: 'networkidle0', timeout: 100000 });
+    await page.waitForTimeout(10000);  // 주문 로딩 기다림
+    await page.waitForSelector('table tbody tr td:nth-of-type(4) p:nth-of-type(2) a', {
+      visible: true,
+      timeout: 30000 // 30초 동안 해당 요소가 나타나길 기다립니다.
+    });
+
     // 크롤링 로직
     console.log('取引ID 취득 시작');
     transactionIDArray = await page.evaluate(() => {
