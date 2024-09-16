@@ -68,7 +68,7 @@ async function buymaOrderList() {
       return getParameter(parameter);
     };
   });
-    await page.goto('https://www.buyma.com/my/buyerorders/?kw=&sts[]=0', { waitUntil: 'networkidle0', timeout: 100000 });
+    await page.goto('https://www.buyma.com/my/buyerorders/?kw=&sts[]=0');
 
     // 로그인 작업 건너뛰기
     if (await page.$('.user_name')) {
