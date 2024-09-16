@@ -21,7 +21,7 @@ async function buymaOrderList() {
         '--no-sandbox',
         '--disable-setuid-sandbox',
       ],
-      // slowMo : 1 ,
+      slowMo : 1 ,
       userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
     });
     page = await browser.newPage();
