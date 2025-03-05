@@ -369,12 +369,14 @@ async function buymaOrderDetail(transactionID) {
       // 페이지가 유효한지 먼저 확인
       if (page && page._client && page._client.connection && page._client.connection.closed !== true) {
         await page.close();
+        page = null; // 페이지를 닫은 후 null로 설정
       }
     } catch (error) {
       console.log('페이지 닫기 중 오류 발생 (무시됨):', error.message);
       // 오류가 발생해도 계속 진행
     }
     await browser.close();
+    browser = null; // 브라우저를 닫은 후 null로 설정
     console.log('주문정보 상세 크롤링 종료.');
 
     return orderDetailObject;
@@ -409,12 +411,20 @@ async function buymaOrderDetail(transactionID) {
       peculiarities: ''
     };
   } finally {
-    // 브라우저 리소스 정리
+    // 브라우저 리소스 정리 - 아직 닫히지 않은 경우에만 닫기
     if (page && page.close) {
-      await page.close().catch(e => console.log('페이지 닫기 오류:', e));
+      try {
+        await page.close();
+      } catch (e) {
+        console.log('페이지 닫기 오류 (무시됨):', e.message);
+      }
     }
     if (browser && browser.close) {
-      await browser.close().catch(e => console.log('브라우저 닫기 오류:', e));
+      try {
+        await browser.close();
+      } catch (e) {
+        console.log('브라우저 닫기 오류 (무시됨):', e.message);
+      }
     }
   }
 }
