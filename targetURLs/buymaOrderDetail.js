@@ -60,183 +60,228 @@ async function buymaOrderDetail(transactionID) {
       console.log('바이머 상세화면에 이미 본인확인 되어있습니다.');
     }
 
-    await page.waitForTimeout(20000); // 없으면 크롤링 안됨
+    // 페이지 로딩 대기 시간 증가 및 요소 존재 확인
+    await page.waitForTimeout(30000); // 30초로 증가
+    
     // 주문정보 상세 크롤링
     console.log('주문정보 상세 취득');
-    orderDetailObject = await page.evaluate(() => {
-      const orderDetailObject = {};
-      let productId = document
-        .querySelector('table tbody tr:nth-of-type(3) td')
-        ?.innerText.match(/\d{8}/g);
-      let productCustomerNameArray = document
-        .querySelector('table tbody tr:nth-of-type(7) td')
-        ?.innerText.split('\n');
-      let productCustomerPostalCode = document
-        .querySelector('table tbody tr:nth-of-type(9) td')
-        ?.innerText.split('\n');
-      let productCustomerJPAddress = document
-        .querySelector('table tbody tr:nth-of-type(10) td dl:nth-of-type(1) dd')
-        ?.innerText.split('\n');
-      let productCustomerENAddress = document
-        .querySelector('table tbody tr:nth-of-type(10) td dl:nth-of-type(2) dd')
-        ?.innerText.split('\n');
-      let productCustomerCellPhoneNumber = document
-        .querySelector('table tbody tr:nth-of-type(11) td ')
-        ?.innerText.match(/\d{2,4}-\d{2,4}-\d{2,4}/g);
-      let productCount = document
-        .querySelector('table tbody tr:nth-of-type(13) td')
-        ?.innerText.match(/\d{1,2}/g);
-      // 2021/10/14 update productOrderDate도 지불방식에 따라 테이블 갯수가 달라져서 분기처리
-      // 2021/08/14 update 편의점 지불인 경우 분기처리
-      // 2023/11/23 update 쿠폰사용인 경우 분기처리
-      let productOrderDate;
-      let productColor;
-      if (document.querySelector('table tbody tr:nth-of-type(14) th')?.innerHTML.match(/使用クーポン/g)) {
-        if (
-          document.querySelector('table tbody tr:nth-of-type(15) td')?.innerHTML.match(/コンビニ/g)
-        ) {
-          productOrderDate = document
-            .querySelector('table tbody tr:nth-of-type(18) td')
-            ?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
-          productColor = document.querySelector('table tbody tr:nth-of-type(19) td')?.innerText;
-        } else if (
-          document
-            .querySelector('table tbody tr:nth-of-type(15) td')
-            ?.innerHTML.match(/銀行振込（ペイジー）/g)
-        ) {
-          productOrderDate = document
-            .querySelector('table tbody tr:nth-of-type(18) td')
-            ?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
-          productColor = document.querySelector('table tbody tr:nth-of-type(19) td')?.innerText;
-        } else {
-          productOrderDate = document
-            .querySelector('table tbody tr:nth-of-type(17) td')
-            ?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
-          productColor = document.querySelector('table tbody tr:nth-of-type(18) td')?.innerText;
-        }
-      }else {
-        if (
-          document.querySelector('table tbody tr:nth-of-type(14) td')?.innerHTML.match(/コンビニ/g)
-        ) {
-          productOrderDate = document
-            .querySelector('table tbody tr:nth-of-type(17) td')
-            ?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
-          productColor = document.querySelector('table tbody tr:nth-of-type(18) td')?.innerText;
-        } else if (
-          document
-            .querySelector('table tbody tr:nth-of-type(14) td')
-            ?.innerHTML.match(/銀行振込（ペイジー）/g)
-        ) {
-          productOrderDate = document
-            .querySelector('table tbody tr:nth-of-type(17) td')
-            ?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
-          productColor = document.querySelector('table tbody tr:nth-of-type(18) td')?.innerText;
-        } else {
-          productOrderDate = document
-            .querySelector('table tbody tr:nth-of-type(16) td')
-            ?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
-          productColor = document.querySelector('table tbody tr:nth-of-type(17) td')?.innerText;
-        }
-      }
-
-      // 通常뒤의 숫자하나 취득
-      let productDeliveryMethod = document
-        .querySelector('table tbody tr:nth-of-type(12) td')
-        ?.innerText.match(/(?<=通常)\d{1,2}/g);
-
-      // ヤマト運輸, 韓国郵便局을 취득
-      // 2023/9/26 ヤマト運輸, 韓国郵便局,kse을 취득
-      let yamatoAndEmsAndKseDeliveryMethod = document
-        .querySelector('table tbody tr:nth-of-type(12) td')
-        ?.innerText.match(/(?<=配送方法：)\D{1,5}/g);
-
-      // 発送期限日 취득
-      let productDeadlineDate = document
-        .querySelector('table tbody tr:nth-of-type(6) td')
-        .innerText.match(/^\d{4}\/(0[1-9]|1[012])\/(0[1-9]|[12][0-9]|3[01])/g);
-
-      // 商品ID
-      productId ? (orderDetailObject.productId = '00' + productId[0]) : null;
-      // お客様氏名（日本語）
-      productCustomerNameArray
-        ? (orderDetailObject.productCustomerJPName =
-            productCustomerNameArray[0] + ' ' + productCustomerNameArray[1])
-        : null;
-      // お客様氏名（英語）
-      productCustomerNameArray
-        ? (orderDetailObject.productCustomerENName = productCustomerNameArray[2])
-        : null;
-      // 郵便番号
-      productCustomerPostalCode
-        ? (orderDetailObject.productCustomerPostalCode = productCustomerPostalCode[0])
-        : null;
-      // 住所（日本語）
-      productCustomerJPAddress
-        ? (orderDetailObject.productCustomerJPAddress =
-            productCustomerJPAddress[0] +
-            ' ' +
-            productCustomerJPAddress[1] +
-            ' ' +
-            productCustomerJPAddress[2])
-        : null;
-      // 住所（英語）
-      productCustomerENAddress
-        ? (orderDetailObject.productCustomerENAddress =
-            productCustomerENAddress[3] +
-            ' ' +
-            productCustomerENAddress[2] +
-            ' ' +
-            productCustomerENAddress[1] +
-            ' ' +
-            productCustomerENAddress[0])
-        : null;
-      // 2022/04/23 영어주소 나눠서 취득
-      // 住所1（英語）
-      productCustomerENAddress[3]
-        ? (orderDetailObject.productCustomerENAddress1 = productCustomerENAddress[3])
-        : null;
-      // 住所1（英語）
-      productCustomerENAddress[2]
-        ? (orderDetailObject.productCustomerENAddress2 = productCustomerENAddress[2])
-        : null;
-      // 住所1（英語）
-      productCustomerENAddress[1]
-        ? (orderDetailObject.productCustomerENAddress3 = productCustomerENAddress[1])
-        : null;
-      // 住所1（英語）
-      productCustomerENAddress[0]
-        ? (orderDetailObject.productCustomerENAddress4 = productCustomerENAddress[0])
-        : null;
-      // 携帯番号
-      productCustomerCellPhoneNumber
-        ? (orderDetailObject.productCustomerCellPhoneNumber = productCustomerCellPhoneNumber[0])
-        : null;
-      // 個数
-      productCount ? (orderDetailObject.productCount = productCount[0]) : null;
-      // 受注日
-      productOrderDate ? (orderDetailObject.productOrderDate = productOrderDate[0]) : null;
-      // カラー
-      orderDetailObject.productColor = productColor;
-      // 配送方法
-      if (productDeliveryMethod) {
-        if (productDeliveryMethod[0] == '4') orderDetailObject.productDeliveryMethod = '国内発送';
-        else if (productDeliveryMethod[0] == '7' && yamatoAndEmsAndKseDeliveryMethod == '韓国郵便局')
-          orderDetailObject.productDeliveryMethod = 'ems';
-        else if (productDeliveryMethod[0] == '12')
-          orderDetailObject.productDeliveryMethod = 'qxpress';
-        else if (productDeliveryMethod[0] == '25')
-          orderDetailObject.productDeliveryMethod = 'ems'; // 중국으로부터 오는 유리테이블
-        else if (productDeliveryMethod[0] == '30') orderDetailObject.productDeliveryMethod = 'ship';
-        else if (productDeliveryMethod[0] == '7' && yamatoAndEmsAndKseDeliveryMethod == 'ヤマト運輸')
-          orderDetailObject.productDeliveryMethod = 'yamato';
-        else if (productDeliveryMethod[0] == '7' && yamatoAndEmsAndKseDeliveryMethod == 'KSE e')
-          orderDetailObject.productDeliveryMethod = 'KSE'; // 2023/9/26 KSE 추가
-      }
-      // 発送期限日
-      productDeadlineDate ? (orderDetailObject.productDeadlineDate = productDeadlineDate[0]) : null;
-
-      return orderDetailObject;
+    
+    // 페이지에 필요한 요소가 있는지 확인
+    const hasRequiredElements = await page.evaluate(() => {
+      return !!document.querySelector('table tbody tr:nth-of-type(3) td');
     });
+    
+    if (!hasRequiredElements) {
+      console.log('필요한 요소를 찾을 수 없습니다. 페이지가 예상대로 로드되지 않았을 수 있습니다.');
+      // 기본 객체 반환
+      orderDetailObject = {
+        productId: '',
+        transactionID: transactionID,
+        rowNum: 0,
+        productURL: '',
+        productProfit: 0,
+        productDeliveryMethod: '',
+        productCustomerJPName: '',
+        productCustomerENName: '',
+        productCustomerPostalCode: '',
+        productCustomerJPAddress: '',
+        productCustomerENAddress: '',
+        productCustomerENAddress1: '',
+        productCustomerENAddress2: '',
+        productCustomerENAddress3: '',
+        productCustomerENAddress4: '',
+        productCustomerCellPhoneNumber: '',
+        productCount: '',
+        productOrderDate: '',
+        productColor: '',
+        productDeadlineDate: '',
+        productTypeEN: '',
+        productPriceEN: '',
+        productWeight: '',
+        comment: '',
+        peculiarities: ''
+      };
+    } else {
+      orderDetailObject = await page.evaluate(() => {
+        const orderDetailObject = {};
+        let productId = document.querySelector('table tbody tr:nth-of-type(3) td');
+        productId = productId ? productId.innerText.match(/\d{8}/g) : null;
+        let productCustomerNameArray = document
+          .querySelector('table tbody tr:nth-of-type(7) td')
+          ?.innerText.split('\n');
+        let productCustomerPostalCode = document
+          .querySelector('table tbody tr:nth-of-type(9) td')
+          ?.innerText.split('\n');
+        let productCustomerJPAddress = document
+          .querySelector('table tbody tr:nth-of-type(10) td dl:nth-of-type(1) dd')
+          ?.innerText.split('\n');
+        let productCustomerENAddress = document
+          .querySelector('table tbody tr:nth-of-type(10) td dl:nth-of-type(2) dd')
+          ?.innerText.split('\n');
+        let productCustomerCellPhoneNumber = document
+          .querySelector('table tbody tr:nth-of-type(11) td ')
+          ?.innerText.match(/\d{2,4}-\d{2,4}-\d{2,4}/g);
+        let productCount = document
+          .querySelector('table tbody tr:nth-of-type(13) td')
+          ?.innerText.match(/\d{1,2}/g);
+        // 2021/10/14 update productOrderDate도 지불방식에 따라 테이블 갯수가 달라져서 분기처리
+        // 2021/08/14 update 편의점 지불인 경우 분기처리
+        // 2023/11/23 update 쿠폰사용인 경우 분기처리
+        let productOrderDate;
+        let productColor;
+        if (document.querySelector('table tbody tr:nth-of-type(14) th')?.innerHTML.match(/使用クーポン/g)) {
+          if (
+            document.querySelector('table tbody tr:nth-of-type(15) td')?.innerHTML.match(/コンビニ/g)
+          ) {
+            productOrderDate = document
+              .querySelector('table tbody tr:nth-of-type(18) td')
+              ?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
+            productColor = document.querySelector('table tbody tr:nth-of-type(19) td')?.innerText;
+          } else if (
+            document
+              .querySelector('table tbody tr:nth-of-type(15) td')
+              ?.innerHTML.match(/銀行振込（ペイジー）/g)
+          ) {
+            productOrderDate = document
+              .querySelector('table tbody tr:nth-of-type(18) td')
+              ?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
+            productColor = document.querySelector('table tbody tr:nth-of-type(19) td')?.innerText;
+          } else {
+            productOrderDate = document
+              .querySelector('table tbody tr:nth-of-type(17) td')
+              ?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
+            productColor = document.querySelector('table tbody tr:nth-of-type(18) td')?.innerText;
+          }
+        }else {
+          if (
+            document.querySelector('table tbody tr:nth-of-type(14) td')?.innerHTML.match(/コンビニ/g)
+          ) {
+            productOrderDate = document
+              .querySelector('table tbody tr:nth-of-type(17) td')
+              ?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
+            productColor = document.querySelector('table tbody tr:nth-of-type(18) td')?.innerText;
+          } else if (
+            document
+              .querySelector('table tbody tr:nth-of-type(14) td')
+              ?.innerHTML.match(/銀行振込（ペイジー）/g)
+          ) {
+            productOrderDate = document
+              .querySelector('table tbody tr:nth-of-type(17) td')
+              ?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
+            productColor = document.querySelector('table tbody tr:nth-of-type(18) td')?.innerText;
+          } else {
+            productOrderDate = document
+              .querySelector('table tbody tr:nth-of-type(16) td')
+              ?.innerText.match(/\d{4}\/\d{2}\/\d{2}/g);
+            productColor = document.querySelector('table tbody tr:nth-of-type(17) td')?.innerText;
+          }
+        }
+
+        // 通常뒤의 숫자하나 취득
+        let productDeliveryMethod = document
+          .querySelector('table tbody tr:nth-of-type(12) td')
+          ?.innerText.match(/(?<=通常)\d{1,2}/g);
+
+        // ヤマト運輸, 韓国郵便局을 취득
+        // 2023/9/26 ヤマト運輸, 韓国郵便局,kse을 취득
+        let yamatoAndEmsAndKseDeliveryMethod = document
+          .querySelector('table tbody tr:nth-of-type(12) td')
+          ?.innerText.match(/(?<=配送方法：)\D{1,5}/g);
+
+        // 発送期限日 취득
+        let productDeadlineDate = document
+          .querySelector('table tbody tr:nth-of-type(6) td')
+          .innerText.match(/^\d{4}\/(0[1-9]|1[012])\/(0[1-9]|[12][0-9]|3[01])/g);
+
+        // 商品ID
+        productId ? (orderDetailObject.productId = '00' + productId[0]) : null;
+        // お客様氏名（日本語）
+        productCustomerNameArray
+          ? (orderDetailObject.productCustomerJPName =
+              productCustomerNameArray[0] + ' ' + productCustomerNameArray[1])
+          : null;
+        // お客様氏名（英語）
+        productCustomerNameArray
+          ? (orderDetailObject.productCustomerENName = productCustomerNameArray[2])
+          : null;
+        // 郵便番号
+        productCustomerPostalCode
+          ? (orderDetailObject.productCustomerPostalCode = productCustomerPostalCode[0])
+          : null;
+        // 住所（日本語）
+        productCustomerJPAddress
+          ? (orderDetailObject.productCustomerJPAddress =
+              productCustomerJPAddress[0] +
+              ' ' +
+              productCustomerJPAddress[1] +
+              ' ' +
+              productCustomerJPAddress[2])
+          : null;
+        // 住所（英語）
+        productCustomerENAddress
+          ? (orderDetailObject.productCustomerENAddress =
+              productCustomerENAddress[3] +
+              ' ' +
+              productCustomerENAddress[2] +
+              ' ' +
+              productCustomerENAddress[1] +
+              ' ' +
+              productCustomerENAddress[0])
+          : null;
+        // 2022/04/23 영어주소 나눠서 취득
+        // 住所1（英語）
+        productCustomerENAddress[3]
+          ? (orderDetailObject.productCustomerENAddress1 = productCustomerENAddress[3])
+          : null;
+        // 住所1（英語）
+        productCustomerENAddress[2]
+          ? (orderDetailObject.productCustomerENAddress2 = productCustomerENAddress[2])
+          : null;
+        // 住所1（英語）
+        productCustomerENAddress[1]
+          ? (orderDetailObject.productCustomerENAddress3 = productCustomerENAddress[1])
+          : null;
+        // 住所1（英語）
+        productCustomerENAddress[0]
+          ? (orderDetailObject.productCustomerENAddress4 = productCustomerENAddress[0])
+          : null;
+        // 携帯番号
+        productCustomerCellPhoneNumber
+          ? (orderDetailObject.productCustomerCellPhoneNumber = productCustomerCellPhoneNumber[0])
+          : null;
+        // 個数
+        productCount ? (orderDetailObject.productCount = productCount[0]) : null;
+        // 受注日
+        productOrderDate ? (orderDetailObject.productOrderDate = productOrderDate[0]) : null;
+        // カラー
+        orderDetailObject.productColor = productColor;
+        // 配送方法
+        if (productDeliveryMethod) {
+          if (productDeliveryMethod[0] == '4') orderDetailObject.productDeliveryMethod = '国内発送';
+          else if (productDeliveryMethod[0] == '7' && yamatoAndEmsAndKseDeliveryMethod == '韓国郵便局')
+            orderDetailObject.productDeliveryMethod = 'ems';
+          else if (productDeliveryMethod[0] == '12')
+            orderDetailObject.productDeliveryMethod = 'qxpress';
+          else if (productDeliveryMethod[0] == '25')
+            orderDetailObject.productDeliveryMethod = 'ems'; // 중국으로부터 오는 유리테이블
+          else if (productDeliveryMethod[0] == '30') orderDetailObject.productDeliveryMethod = 'ship';
+          else if (productDeliveryMethod[0] == '7' && yamatoAndEmsAndKseDeliveryMethod == 'ヤマト運輸')
+            orderDetailObject.productDeliveryMethod = 'yamato';
+          else if (productDeliveryMethod[0] == '7' && yamatoAndEmsAndKseDeliveryMethod == 'KSE e')
+            orderDetailObject.productDeliveryMethod = 'KSE'; // 2023/9/26 KSE 추가
+        }
+        // 発送期限日
+        productDeadlineDate ? (orderDetailObject.productDeadlineDate = productDeadlineDate[0]) : null;
+
+        return orderDetailObject;
+      });
+      
+      // transactionID 설정 확인
+      if (!orderDetailObject.transactionID) {
+        orderDetailObject.transactionID = transactionID;
+      }
+    }
+    
     // 구글 시트(利益計算)에서 商品ID에 해당하는 row넘버, 이익 취득
     console.log('구글 시트(利益計算)에서 정보 취득');
     let googleProfitObject;
@@ -311,9 +356,6 @@ async function buymaOrderDetail(transactionID) {
         orderDetailObject.productProfit =
           googleProfitObject.kseProfit * orderDetailObject.productCount;
 
-    // 取引ID
-    orderDetailObject.transactionID = transactionID;
-
     // 2022/04/23 商品種類(英語),価格(ドル),商品重さ(g),コメント를 취득
     orderDetailObject.productTypeEN = googleProfitObject.productTypeEN;
     orderDetailObject.productPriceEN = googleProfitObject.productPriceEN;
@@ -329,9 +371,43 @@ async function buymaOrderDetail(transactionID) {
 
     return orderDetailObject;
   } catch (e) {
-    console.log(e);
-    await page.close();
-    await browser.close();
+    console.log('buymaOrderDetail 함수에서 오류 발생:', e);
+    // 오류 발생 시에도 기본 객체 반환
+    return {
+      productId: '',
+      transactionID: transactionID,
+      rowNum: 0,
+      productURL: '',
+      productProfit: 0,
+      productDeliveryMethod: '',
+      productCustomerJPName: '',
+      productCustomerENName: '',
+      productCustomerPostalCode: '',
+      productCustomerJPAddress: '',
+      productCustomerENAddress: '',
+      productCustomerENAddress1: '',
+      productCustomerENAddress2: '',
+      productCustomerENAddress3: '',
+      productCustomerENAddress4: '',
+      productCustomerCellPhoneNumber: '',
+      productCount: '',
+      productOrderDate: '',
+      productColor: '',
+      productDeadlineDate: '',
+      productTypeEN: '',
+      productPriceEN: '',
+      productWeight: '',
+      comment: '',
+      peculiarities: ''
+    };
+  } finally {
+    // 브라우저 리소스 정리
+    if (page && page.close) {
+      await page.close().catch(e => console.log('페이지 닫기 오류:', e));
+    }
+    if (browser && browser.close) {
+      await browser.close().catch(e => console.log('브라우저 닫기 오류:', e));
+    }
   }
 }
 
