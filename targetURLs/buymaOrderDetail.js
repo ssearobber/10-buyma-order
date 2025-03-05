@@ -366,11 +366,13 @@ async function buymaOrderDetail(transactionID) {
     orderDetailObject.peculiarities = googleProfitObject.peculiarities;
 
     try {
-      if (page && !page.isClosed()) {
+      // 페이지가 유효한지 먼저 확인
+      if (page && page._client && page._client.connection && page._client.connection.closed !== true) {
         await page.close();
       }
     } catch (error) {
       console.log('페이지 닫기 중 오류 발생 (무시됨):', error.message);
+      // 오류가 발생해도 계속 진행
     }
     await browser.close();
     console.log('주문정보 상세 크롤링 종료.');
