@@ -105,7 +105,8 @@ async function buymaOrderDetail(transactionID) {
       orderDetailObject = await page.evaluate(() => {
         const orderDetailObject = {};
         let productId = document.querySelector('table tbody tr:nth-of-type(3) td');
-        productId = productId ? productId.innerText.match(/\d{8}/g) : null;
+        // 8자리 또는 9자리 숫자 패턴 모두 매칭하도록 수정
+        productId = productId ? productId.innerText.match(/\d{8,9}/g) : null;
         let productCustomerNameArray = document
           .querySelector('table tbody tr:nth-of-type(7) td')
           ?.innerText.split('\n');
@@ -193,8 +194,17 @@ async function buymaOrderDetail(transactionID) {
           .querySelector('table tbody tr:nth-of-type(6) td')
           .innerText.match(/^\d{4}\/(0[1-9]|1[012])\/(0[1-9]|[12][0-9]|3[01])/g);
 
-        // 商品ID
-        productId ? (orderDetailObject.productId = '00' + productId[0]) : null;
+        // 商品ID - 8자리면 '00'을 붙이고, 9자리면 '0'을 붙여서 10자리로 만듦
+        if (productId) {
+          const idValue = productId[0];
+          if (idValue.length === 8) {
+            orderDetailObject.productId = '00' + idValue;
+          } else if (idValue.length === 9) {
+            orderDetailObject.productId = '0' + idValue;
+          } else {
+            orderDetailObject.productId = idValue; // 다른 자릿수의 경우 그대로 사용
+          }
+        }
         // お客様氏名（日本語）
         productCustomerNameArray
           ? (orderDetailObject.productCustomerJPName =
