@@ -365,7 +365,13 @@ async function buymaOrderDetail(transactionID) {
     // 2022/11/08 特異事項 추가
     orderDetailObject.peculiarities = googleProfitObject.peculiarities;
 
-    await page.close();
+    try {
+      if (page && !page.isClosed()) {
+        await page.close();
+      }
+    } catch (error) {
+      console.log('페이지 닫기 중 오류 발생 (무시됨):', error.message);
+    }
     await browser.close();
     console.log('주문정보 상세 크롤링 종료.');
 
