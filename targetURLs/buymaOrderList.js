@@ -73,7 +73,7 @@ async function buymaOrderList() {
         '--disable-setuid-sandbox',
       ],
       // slowMo : 1 ,
-      // userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
+      userDataDir: path.join(__dirname, '../UserData'), // 로그인 정보 쿠키 저장
     });
     page = await browser.newPage();
     // await page.setViewport({
@@ -84,59 +84,29 @@ async function buymaOrderList() {
     // User-Agent 설정 추가 (브라우저 버전과 운영 체제를 일반적인 것으로 설정)
   page = await loadPage(browser, 'https://www.buyma.com/my/orders/');
 
-    // 로그인 작업 건너뛰기
     // if (await page.$('.user_name')) {
     //   console.log('이미 로그인 되어 있습니다.');
     // } else {
-    //   await page.evaluate(
-    //     (id, password) => {
-    //       // login
-    //       document.querySelector('#txtLoginId').value = id;
-    //       document.querySelector('#txtLoginPass').value = password;
-    //       document.querySelector('#login_do').click();
-    //     },
-    //     id,
-    //     password,
-    //   );
-    //   console.log('로그인했습니다.');
-    // }
-    // await page.setCacheEnabled(false);
-    // await page.reload({ waitUntil: 'networkidle0' });
-    // await page.waitForSelector('#txtLoginId', {
-    //   visible: true,
-    //   timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
-    // });
-    // await page.waitForSelector('#txtLoginPass', {
-    //   visible: true,
-    //   timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
-    // });
-    // await page.waitForSelector('#login_do', {
-    //   visible: true,
-    //   timeout: 100000 // 100초 동안 해당 요소가 나타나길 기다립니다.
-    // });
-//     if (await page.$('.user_name')) {
-//       console.log('이미 로그인 되어 있습니다.');
-//     } else {
-//       console.log('로그인 시도...');
-//       const elementsInfo = await page.evaluate((id, password) => {
-//         const loginIdElement = document.querySelector('#txtLoginId');
-//         const loginPassElement = document.querySelector('#txtLoginPass');
-//         const loginButtonElement = document.querySelector('#login_do');
+    //   console.log('로그인 시도...');
+    //   const elementsInfo = await page.evaluate((id, password) => {
+    //     const loginIdElement = document.querySelector('#txtLoginId');
+    //     const loginPassElement = document.querySelector('#txtLoginPass');
+    //     const loginButtonElement = document.querySelector('#login_do');
     
-//         if (loginIdElement && loginPassElement && loginButtonElement) {
-//             // loginIdElement.value = id;
-//             // loginPassElement.value = password;
-//             return {
-//                 loginIdElementHtml: loginIdElement.outerHTML,
-//                 loginPassElementHtml: loginPassElement.outerHTML,
-//                 loginButtonElementHtml: loginButtonElement.outerHTML
-//             };
-//         } else {
-//             throw new Error('Login form elements not found');
-//         }
-//     }, id, password);
+    //     if (loginIdElement && loginPassElement && loginButtonElement) {
+    //         // loginIdElement.value = id;
+    //         // loginPassElement.value = password;
+    //         return {
+    //             loginIdElementHtml: loginIdElement.outerHTML,
+    //             loginPassElementHtml: loginPassElement.outerHTML,
+    //             loginButtonElementHtml: loginButtonElement.outerHTML
+    //         };
+    //     } else {
+    //         throw new Error('Login form elements not found');
+    //     }
+    // }, id, password);
     
-//     console.log('Login form elements:', elementsInfo);
+    // console.log('Login form elements:', elementsInfo);
 
     // Type the login ID and password slowly
     await page.type('#txtLoginId', id, { delay: 150 }); // Typing ID with 100ms delay between keystrokes
@@ -149,7 +119,7 @@ async function buymaOrderList() {
           loginPassElement.value = ''; // Clear the ID field
       }
     });
-    console.log('Id field cleared.');
+    console.log('Id 입력란 지우기.');
 
     // Type the login ID and password slowly
     await page.type('#txtLoginId', id, { delay: 150 }); // Typing ID with 100ms delay between keystrokes
@@ -157,7 +127,7 @@ async function buymaOrderList() {
 
     await page.type('#txtLoginPass', password, { delay: 150 }); // Typing password with 100ms delay between keystrokes
 
-    console.log('Login ID and Password typed slowly.');
+    console.log('Login ID 그리고 Password 입력란에 느리게 입력');
 
     // Wait for a few seconds before entering the password again
     await page.waitForTimeout(5000); // Wait for 3 seconds
@@ -169,7 +139,7 @@ async function buymaOrderList() {
           loginPassElement.value = ''; // Clear the password field
       }
     });
-    console.log('Password field cleared.');
+    console.log('Password 입력란 지우기.');
 
     await page.waitForTimeout(5000); // Wait for 3 seconds
 
@@ -177,9 +147,6 @@ async function buymaOrderList() {
     await page.type('#txtLoginPass', password, { delay: 150 }); // Typing password again with 100ms delay between keystrokes
 
     await page.waitForTimeout(5000); // Wait for 3 seconds
-
-    // Now click the login button
-    // await page.click('#login_do');
 
     // Enter the password again with the delay
     await page.evaluate((password) => {
@@ -189,11 +156,6 @@ async function buymaOrderList() {
       }
   }, password);
     
-    // await page.evaluate(() => {
-    //     const loginButtonElement = document.querySelector('#login_do');
-    //     loginButtonElement.click();
-    // });
-
       await page.evaluate(() => {
     const loginButtonElement = document.querySelector('#login_do');
     const rect = loginButtonElement.getBoundingClientRect();
@@ -224,38 +186,8 @@ async function buymaOrderList() {
         clientY: y
     }));
     });
+  // }
 
-//     // const loginButtonElement = await page.$('#login_do');
-//     // await loginButtonElement.click();
-//     // const loginButtonElement = await page.$('#login_do');
-//     // const boundingBox = await loginButtonElement.boundingBox();
-
-//     // await page.mouse.move(
-//     //     boundingBox.x + boundingBox.width / 2,
-//     //     boundingBox.y + boundingBox.height / 2
-//     // );
-//     // await page.mouse.down();
-//     // await page.mouse.up();
-
-//     // await page.evaluate(() => {
-//     //   const form = document.querySelector('form');
-//     //   form.submit();
-//     // });
-
-//     // const loginButtonElement = await page.$('#login_do');
-//     // await loginButtonElement.click();
-
-//     // await page.evaluate(() => {
-//     //   const loginButtonElement = document.querySelector('#login_do');
-//     //   if (loginButtonElement) {
-//     //       setTimeout(() => {
-//     //           loginButtonElement.click();
-//     //       }, Math.random() * 3000 + 1000);  // 1초에서 4초 사이의 지연 후 클릭
-//     //   } else {
-//     //       throw new Error('Login button not found');
-//     //   }
-//     // });
-    
     try {
         await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 100000 });
     
@@ -270,76 +202,6 @@ async function buymaOrderList() {
     } catch (error) {
         console.log('Error during login or navigation:', error);
     }
-  
-  // // Step 1: ID 입력
-  // await page.evaluate((id) => {
-  //     const loginIdElement = document.querySelector('#txtLoginId');
-  //     loginIdElement.value = id;
-  // }, id);
-  
-  // // 잠시 대기 (1초 정도, 필요에 따라 조절)
-  // await page.waitForTimeout(1000);
-  
-  // // Step 2: Password 입력
-  // await page.evaluate((password) => {
-  //     const loginPassElement = document.querySelector('#txtLoginPass');
-  //     loginPassElement.value = password;
-  // }, password);
-  
-  // // 잠시 대기 (1초 정도, 필요에 따라 조절)
-  // await page.waitForTimeout(1000);
-  
-//   // Step 3: 로그인 버튼 클릭
-//   // await page.evaluate(() => {
-//   //     const loginButtonElement = document.querySelector('#login_do');
-//   //     loginButtonElement.click();
-//   // });
-//   await page.evaluate(() => {
-//     const loginButtonElement = document.querySelector('#login_do');
-//     const rect = loginButtonElement.getBoundingClientRect();
-//     const x = rect.left + (rect.width / 2);
-//     const y = rect.top + (rect.height / 2);
-
-//     loginButtonElement.dispatchEvent(new MouseEvent('mousedown', {
-//         view: window,
-//         bubbles: true,
-//         cancelable: true,
-//         clientX: x,
-//         clientY: y
-//     }));
-
-//     loginButtonElement.dispatchEvent(new MouseEvent('mouseup', {
-//         view: window,
-//         bubbles: true,
-//         cancelable: true,
-//         clientX: x,
-//         clientY: y
-//     }));
-
-//     loginButtonElement.dispatchEvent(new MouseEvent('click', {
-//         view: window,
-//         bubbles: true,
-//         cancelable: true,
-//         clientX: x,
-//         clientY: y
-//     }));
-// });
-  
-      // console.log('로그인 버튼 클릭 완료, 결과 대기 중...');
-//     }
-
-    // await page.waitForSelector('.user_name', {
-    //   visible: true,
-    //   timeout: 300000 // 5분으로 타임아웃을 늘립니다.
-    // });
-
-    // 페이지 로드 대기
-    // await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 60000 });
-
-    // if (!(await page.$('.user_name'))) {
-    //   console.error('로그인 실패: .user_name 요소를 찾을 수 없습니다.');
-    //   return;
-    // }
 
     // 주문 페이지 재시도 로드
     page = await loadPage(browser, 'https://www.buyma.com/my/orders/');
@@ -357,7 +219,7 @@ async function buymaOrderList() {
     });
 
     console.log('取引ID 크롤링 종료.');
-    console.log('취득한 取引ID : ', transactionIDArray);
+    // console.log('취득한 取引ID : ', transactionIDArray);
     return transactionIDArray;
   } catch (e) {
     console.error(e);

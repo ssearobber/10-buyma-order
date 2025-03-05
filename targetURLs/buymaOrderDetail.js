@@ -239,8 +239,56 @@ async function buymaOrderDetail(transactionID) {
     });
     // 구글 시트(利益計算)에서 商品ID에 해당하는 row넘버, 이익 취득
     console.log('구글 시트(利益計算)에서 정보 취득');
-    let googleProfitObject = await googleProfitSheet(orderDetailObject.productId);
-    console.log('구글 시트(利益計算)에서 정보 취득 종료');
+    let googleProfitObject;
+    try {
+      googleProfitObject = await googleProfitSheet(orderDetailObject.productId);
+      console.log('구글 시트(利益計算)에서 정보 취득 종료');
+    } catch (googleError) {
+      if (googleError.message && googleError.message.includes('Quota exceeded')) {
+        console.log('Google API 할당량 초과. 5초 후 재시도합니다...');
+        // 5초 대기 후 재시도
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        try {
+          googleProfitObject = await googleProfitSheet(orderDetailObject.productId);
+          console.log('구글 시트(利益計算)에서 정보 취득 종료 (재시도 성공)');
+        } catch (retryError) {
+          console.error('Google API 재시도 실패:', retryError);
+          // 기본값 설정
+          googleProfitObject = {
+            rowNum: 0,
+            productURL: '',
+            EMSProfit: 0,
+            qxpressProfit: 0,
+            shipProfit: 0,
+            yamatoProfit: 0,
+            kseProfit: 0,
+            productTypeEN: '',
+            productPriceEN: '',
+            productWeight: '',
+            comment: '',
+            peculiarities: ''
+          };
+        }
+      } else {
+        console.error('Google API 오류:', googleError);
+        // 기본값 설정
+        googleProfitObject = {
+          rowNum: 0,
+          productURL: '',
+          EMSProfit: 0,
+          qxpressProfit: 0,
+          shipProfit: 0,
+          yamatoProfit: 0,
+          kseProfit: 0,
+          productTypeEN: '',
+          productPriceEN: '',
+          productWeight: '',
+          comment: '',
+          peculiarities: ''
+        };
+      }
+    }
+    
     // 구글 시트(利益計算)에서 商品ID에 해당하는 row넘버 셋팅
     orderDetailObject.rowNum = googleProfitObject.rowNum;
     // 상품 url 셋팅
