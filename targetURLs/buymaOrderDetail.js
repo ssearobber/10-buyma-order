@@ -409,12 +409,22 @@ async function buymaOrderDetail(transactionID) {
       peculiarities: ''
     };
   } finally {
-    // 브라우저 리소스 정리
-    if (page && page.close) {
-      await page.close().catch(e => console.log('페이지 닫기 오류:', e));
+    // 브라우저 리소스 정리 - 더 안전한 방식으로 수정
+    try {
+      if (page && typeof page.isClosed === 'function' && !page.isClosed() && 
+          page._client && page._client.connection && !page._client.connection.closed) {
+        await page.close();
+      }
+    } catch (e) {
+      console.log('페이지 닫기 오류 (무시됨):', e.message);
     }
-    if (browser && browser.close) {
-      await browser.close().catch(e => console.log('브라우저 닫기 오류:', e));
+    
+    try {
+      if (browser && typeof browser.isConnected === 'function' && browser.isConnected()) {
+        await browser.close();
+      }
+    } catch (e) {
+      console.log('브라우저 닫기 오류 (무시됨):', e.message);
     }
   }
 }
