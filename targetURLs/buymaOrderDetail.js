@@ -316,7 +316,7 @@ async function buymaOrderDetail(transactionID) {
             qxpressProfit: 0,
             shipProfit: 0,
             yamatoProfit: 0,
-            kseProfit: 0,
+            buymaProfit: 0,
             productTypeEN: '',
             productPriceEN: '',
             productWeight: '',
@@ -334,7 +334,7 @@ async function buymaOrderDetail(transactionID) {
           qxpressProfit: 0,
           shipProfit: 0,
           yamatoProfit: 0,
-          kseProfit: 0,
+          buymaProfit: 0,
           productTypeEN: '',
           productPriceEN: '',
           productWeight: '',
@@ -364,7 +364,7 @@ async function buymaOrderDetail(transactionID) {
         googleProfitObject.yamatoProfit * orderDetailObject.productCount;
     else if (orderDetailObject.productDeliveryMethod == 'KSE')  // 2023/9/26 KSE 추가
         orderDetailObject.productProfit =
-          googleProfitObject.kseProfit * orderDetailObject.productCount;
+          googleProfitObject.buymaProfit * orderDetailObject.productCount;
 
     // 2022/04/23 商品種類(英語),価格(ドル),商品重さ(g),コメント를 취득
     orderDetailObject.productTypeEN = googleProfitObject.productTypeEN;

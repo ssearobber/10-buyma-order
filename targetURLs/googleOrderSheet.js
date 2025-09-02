@@ -62,10 +62,10 @@ async function googleOrderSheet(transactionID) {
         rows[i].productCustomerENAddress4 = orderDetailObject.productCustomerENAddress4;
         rows[i].productCustomerCellPhoneNumber = orderDetailObject.productCustomerCellPhoneNumber;
         rows[i].productProfit = orderDetailObject.productProfit;
-        rows[i].productTypeEN = orderDetailObject.productTypeEN;
-        rows[i].productPriceEN = orderDetailObject.productPriceEN;
-        rows[i].productWeight = orderDetailObject.productWeight;
-        rows[i].comment = orderDetailObject.comment;
+        // rows[i].productTypeEN = orderDetailObject.productTypeEN;
+        // rows[i].productPriceEN = orderDetailObject.productPriceEN;
+        // rows[i].productWeight = orderDetailObject.productWeight;
+        // rows[i].comment = orderDetailObject.comment;
         rows[i].productDeadlineDate = orderDetailObject.productDeadlineDate;
 
         rows[i].save();
