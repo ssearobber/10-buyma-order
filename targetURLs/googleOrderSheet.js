@@ -39,10 +39,22 @@ async function googleOrderSheet(transactionID) {
   // 구글 시트(利益計算)에서 값을 취득 함
   if (!isTransactionID) {
     orderDetailObject = await buymaOrderDetail(transactionID);
+    
+    // 디버깅: orderDetailObject 값 확인
+    console.log('=== orderDetailObject 값 확인 ===');
+    console.log('transactionID:', orderDetailObject.transactionID);
+    console.log('peculiarities:', orderDetailObject.peculiarities);
+    console.log('rowNum:', orderDetailObject.rowNum);
+    console.log('productURL:', orderDetailObject.productURL);
+    console.log('productProfit:', orderDetailObject.productProfit);
+    console.log('================================');
+    
     // 구글 시트(受注list)에 값입력
     for (i = 1; i < rows.length; i++) {
       // row 추가
       if (!rows[i].transactionID) {
+        console.log(`빈 행 발견: ${i}번째 행에 데이터 입력 시작`);
+        
         rows[i].transactionID = orderDetailObject.transactionID;
         rows[i].productOrderDate = orderDetailObject.productOrderDate;
         rows[i].peculiarities = orderDetailObject.peculiarities;
@@ -68,7 +80,9 @@ async function googleOrderSheet(transactionID) {
         // rows[i].comment = orderDetailObject.comment;
         rows[i].productDeadlineDate = orderDetailObject.productDeadlineDate;
 
-        rows[i].save();
+        console.log(`${i}번째 행에 데이터 입력 완료, 저장 시작`);
+        await rows[i].save();
+        console.log(`${i}번째 행 저장 완료`);
         break;
       }
     }

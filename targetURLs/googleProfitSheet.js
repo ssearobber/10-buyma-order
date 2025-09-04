@@ -37,38 +37,45 @@ async function googleProfitSheet(productId) {
       googleProfitObject.productURL = rows[i].productURL;
       
       // 각 profit 값이 존재하는지 확인 후 replace 호출
-      // if (rows[i].shipProfit) {
-      //   googleProfitObject.shipProfit = rows[i].shipProfit.replace(/[^0-9]/g, '');
-      // } else {
-      //   console.log(`shipProfit is undefined for productId: ${productId}`);
-      //   googleProfitObject.shipProfit = '';
-      // }
+      if (rows[i].shipProfit) {
+        googleProfitObject.shipProfit = rows[i].shipProfit.replace(/[^0-9]/g, '');
+      } else {
+        console.log(`shipProfit is undefined for productId: ${productId}`);
+        googleProfitObject.shipProfit = 0;
+      }
 
-      // if (rows[i].EMSProfit) {
-      //   googleProfitObject.EMSProfit = rows[i].EMSProfit.replace(/[^0-9]/g, '');
-      // } else {
-      //   console.log(`EMSProfit is undefined for productId: ${productId}`);
-      //   googleProfitObject.EMSProfit = '';
-      // }
+      if (rows[i].EMSProfit) {
+        googleProfitObject.EMSProfit = rows[i].EMSProfit.replace(/[^0-9]/g, '');
+      } else {
+        console.log(`EMSProfit is undefined for productId: ${productId}`);
+        googleProfitObject.EMSProfit = 0;
+      }
+
+      if (rows[i].qxpressProfit) {
+        googleProfitObject.qxpressProfit = rows[i].qxpressProfit.replace(/[^0-9]/g, '');
+      } else {
+        console.log(`qxpressProfit is undefined for productId: ${productId}`);
+        googleProfitObject.qxpressProfit = 0;
+      }
 
       if (rows[i].buymaProfit) {
         googleProfitObject.buymaProfit = rows[i].buymaProfit.replace(/[^0-9]/g, '');
       } else {
         console.log(`buymaProfit is undefined for productId: ${productId}`);
-        googleProfitObject.buymaProfit = '';
+        googleProfitObject.buymaProfit = 0;
       }
 
-      // if (rows[i].yamatoProfit) {
-      //   googleProfitObject.yamatoProfit = rows[i].yamatoProfit.replace(/[^0-9]/g, '');
-      // } else {
-      //   console.log(`yamatoProfit is undefined for productId: ${productId}`);
-      //   googleProfitObject.yamatoProfit = '';
-      // }
+      if (rows[i].yamatoProfit) {
+        googleProfitObject.yamatoProfit = rows[i].yamatoProfit.replace(/[^0-9]/g, '');
+      } else {
+        console.log(`yamatoProfit is undefined for productId: ${productId}`);
+        googleProfitObject.yamatoProfit = 0;
+      }
       
-      // googleProfitObject.productTypeEN = rows[i].productTypeEN;
-      // googleProfitObject.productPriceEN = rows[i].productPriceEN;
-      // googleProfitObject.productWeight = rows[i].productWeight;
-      // googleProfitObject.comment = rows[i].comment;
+      // googleProfitObject.productTypeEN = rows[i].productTypeEN || '';
+      // googleProfitObject.productPriceEN = rows[i].productPriceEN || '';
+      // googleProfitObject.productWeight = rows[i].productWeight || '';
+      // googleProfitObject.comment = rows[i].comment || '';
     }
   }
 
