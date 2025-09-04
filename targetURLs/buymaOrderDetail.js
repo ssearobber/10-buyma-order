@@ -46,6 +46,9 @@ async function buymaOrderDetail(transactionID) {
         password,
       );
       console.log('로그인했습니다.');
+      
+      // 로그인 후 페이지 로딩 대기
+      await page.waitForTimeout(3000);
     }
 
     // 본인 확인 작업 건너뛰기
@@ -56,8 +59,24 @@ async function buymaOrderDetail(transactionID) {
         document.querySelector('#login_do').click();
       }, password);
       console.log('바이머 상세화면에서 본인확인했습니다.');
+      
+      // 본인 확인 후 페이지 로딩 대기
+      await page.waitForTimeout(5000);
     } else {
       console.log('바이머 상세화면에 이미 본인확인 되어있습니다.');
+    }
+    
+    // 현재 URL 확인 및 올바른 페이지로 이동
+    const currentUrl = page.url();
+    const expectedUrl = `https://www.buyma.com/my/buyerorderdetail/?tid=${transactionID}`;
+    
+    console.log('현재 URL:', currentUrl);
+    console.log('예상 URL:', expectedUrl);
+    
+    if (!currentUrl.includes('buyerorderdetail')) {
+      console.log('올바르지 않은 페이지입니다. 주문 상세 페이지로 이동합니다.');
+      await page.goto(expectedUrl);
+      await page.waitForTimeout(5000);
     }
 
     // 페이지 로딩 대기 시간 증가 및 요소 존재 확인
