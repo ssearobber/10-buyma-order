@@ -66,12 +66,51 @@ async function buymaOrderDetail(transactionID) {
     // 주문정보 상세 크롤링
     console.log('주문정보 상세 취득');
     
-    // 페이지에 필요한 요소가 있는지 확인
-    const hasRequiredElements = await page.evaluate(() => {
-      return !!document.querySelector('table tbody tr:nth-of-type(3) td');
+    // 페이지에 필요한 요소가 있는지 확인 및 디버깅
+    const pageInfo = await page.evaluate(() => {
+      const table = document.querySelector('table');
+      const tbody = document.querySelector('table tbody');
+      const targetRow = document.querySelector('table tbody tr:nth-of-type(3) td');
+      
+      // 페이지의 모든 테이블 행 확인
+      const allRows = document.querySelectorAll('table tbody tr');
+      const rowsInfo = [];
+      
+      for (let i = 0; i < Math.min(10, allRows.length); i++) {
+        const cells = allRows[i].querySelectorAll('td');
+        if (cells.length > 0) {
+          rowsInfo.push({
+            rowIndex: i + 1,
+            firstCellText: cells[0] ? cells[0].innerText.substring(0, 100) : 'empty'
+          });
+        }
+      }
+      
+      return {
+        hasTable: !!table,
+        hasTbody: !!tbody,
+        hasTargetRow: !!targetRow,
+        totalRows: allRows.length,
+        rowsInfo: rowsInfo,
+        pageTitle: document.title,
+        url: window.location.href
+      };
     });
     
-    if (!hasRequiredElements) {
+    console.log('=== 페이지 구조 분석 ===');
+    console.log('페이지 제목:', pageInfo.pageTitle);
+    console.log('현재 URL:', pageInfo.url);
+    console.log('테이블 존재:', pageInfo.hasTable);
+    console.log('tbody 존재:', pageInfo.hasTbody);
+    console.log('3번째 행 존재:', pageInfo.hasTargetRow);
+    console.log('총 행 수:', pageInfo.totalRows);
+    console.log('처음 10개 행 정보:');
+    pageInfo.rowsInfo.forEach(row => {
+      console.log(`  ${row.rowIndex}번째 행: ${row.firstCellText}`);
+    });
+    console.log('========================');
+    
+    if (!pageInfo.hasTargetRow) {
       console.log('필요한 요소를 찾을 수 없습니다. 페이지가 예상대로 로드되지 않았을 수 있습니다.');
       // 기본 객체 반환
       orderDetailObject = {
@@ -104,7 +143,29 @@ async function buymaOrderDetail(transactionID) {
     } else {
       orderDetailObject = await page.evaluate(() => {
         const orderDetailObject = {};
-        let productId = document.querySelector('table tbody tr:nth-of-type(3) td');
+        
+        // 상품ID 추출 디버깅
+        console.log('=== 상품ID 추출 디버깅 ===');
+        const productIdElement = document.querySelector('table tbody tr:nth-of-type(3) td');
+        console.log('3번째 행 td 요소:', productIdElement);
+        console.log('3번째 행 내용:', productIdElement ? productIdElement.innerText : 'null');
+        
+        // 다른 가능한 위치들도 확인
+        const allRows = document.querySelectorAll('table tbody tr');
+        console.log('모든 행에서 상품ID 패턴 검색:');
+        for (let i = 0; i < Math.min(15, allRows.length); i++) {
+          const cells = allRows[i].querySelectorAll('td');
+          if (cells.length > 0) {
+            const text = cells[0].innerText;
+            const hasProductId = text.match(/\d{8,10}/g);
+            if (hasProductId) {
+              console.log(`  ${i+1}번째 행에서 발견: ${text} -> ${hasProductId}`);
+            }
+          }
+        }
+        console.log('========================');
+        
+        let productId = productIdElement;
         // 8자리 또는 9자리 숫자 패턴 모두 매칭하도록 수정
         productId = productId ? productId.innerText.match(/\d{8,9}/g) : null;
         let productCustomerNameArray = document
