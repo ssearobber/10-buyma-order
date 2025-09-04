@@ -294,6 +294,7 @@ async function buymaOrderDetail(transactionID) {
     
     // 구글 시트(利益計算)에서 商品ID에 해당하는 row넘버, 이익 취득
     console.log('구글 시트(利益計算)에서 정보 취득');
+    console.log(`크롤링된 productId: ${orderDetailObject.productId}`);
     let googleProfitObject;
     try {
       googleProfitObject = await googleProfitSheet(orderDetailObject.productId);

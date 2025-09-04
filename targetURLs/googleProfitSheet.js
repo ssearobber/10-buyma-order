@@ -26,12 +26,20 @@ async function googleProfitSheet(productId) {
 
   // 해당 商品ID의 row번호, url을 취득
   let googleProfitObject = {};
+  console.log(`=== googleProfitSheet 검색 시작 ===`);
+  console.log(`검색할 productId: ${productId}`);
+  console.log(`전체 행 수: ${rows.length}`);
+  
   for (i = 1; i < rows.length; i++) {
     // if (!rows[i].productId) continue;
     if (!rows[i].buymaProductId) continue;
+    
+    console.log(`${i}번째 행 buymaProductId: ${rows[i].buymaProductId}`);
+    
     // 해당 商品ID가 존재하는 row
     // if (rows[i].productId.match(/\d{10}/g) == productId) {
     if (rows[i].buymaProductId.match(/\d{10}/g) == productId) {
+      console.log(`매칭 성공! ${i}번째 행에서 productId ${productId} 발견`);
       googleProfitObject.rowNum = i + 2;
       googleProfitObject.peculiarities = rows[i].peculiarities;
       googleProfitObject.productURL = rows[i].productURL;
@@ -76,7 +84,22 @@ async function googleProfitSheet(productId) {
       // googleProfitObject.productPriceEN = rows[i].productPriceEN || '';
       // googleProfitObject.productWeight = rows[i].productWeight || '';
       // googleProfitObject.comment = rows[i].comment || '';
+      
+      console.log(`=== 매칭된 데이터 확인 ===`);
+      console.log(`rowNum: ${googleProfitObject.rowNum}`);
+      console.log(`peculiarities: ${googleProfitObject.peculiarities}`);
+      console.log(`productURL: ${googleProfitObject.productURL}`);
+      console.log(`buymaProfit: ${googleProfitObject.buymaProfit}`);
+      console.log(`===============================`);
+      
+      break; // 매칭되면 루프 종료
     }
+  }
+  
+  // 매칭되지 않은 경우 로그 출력
+  if (!googleProfitObject.rowNum) {
+    console.log(`⚠️  productId ${productId}에 해당하는 데이터를 찾을 수 없습니다!`);
+    console.log(`구글 시트(이익계산)에 해당 상품ID가 있는지 확인해주세요.`);
   }
 
   return googleProfitObject;
