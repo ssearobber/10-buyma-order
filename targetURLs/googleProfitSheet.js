@@ -34,11 +34,19 @@ async function googleProfitSheet(productId) {
     // if (!rows[i].productId) continue;
     if (!rows[i].buymaProductId) continue;
     
-    console.log(`${i}번째 행 buymaProductId: ${rows[i].buymaProductId}`);
-    
     // 해당 商品ID가 존재하는 row
     // if (rows[i].productId.match(/\d{10}/g) == productId) {
-    if (rows[i].buymaProductId.match(/\d{10}/g) == productId) {
+    const extractedId = rows[i].buymaProductId.match(/\d{10}/g);
+    
+    // 매칭 디버깅 (처음 5개와 매칭된 경우만 출력)
+    if (i <= 5 || (extractedId && extractedId[0] == productId)) {
+      console.log(`${i}번째 행 buymaProductId: ${rows[i].buymaProductId}`);
+      if (extractedId) {
+        console.log(`  추출된 ID: ${extractedId[0]}, 검색 ID: ${productId}, 매칭: ${extractedId[0] == productId}`);
+      }
+    }
+    
+    if (extractedId && extractedId[0] == productId) {
       console.log(`매칭 성공! ${i}번째 행에서 productId ${productId} 발견`);
       googleProfitObject.rowNum = i + 2;
       googleProfitObject.peculiarities = rows[i].peculiarities;
